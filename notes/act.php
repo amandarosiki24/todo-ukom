@@ -16,7 +16,7 @@ $role_name = $_SESSION['role_name'];
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Sprinklist</title>
+<title>Sprinklist - Template</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -131,7 +131,7 @@ body {
   top: 0;
   z-index: 100;
 }
-/* 🌱 Logo Animasi Mini */
+
 .sprinklist-logo {
   display: flex;
   align-items: center;
@@ -201,34 +201,9 @@ body {
   margin-left: 250px;
   margin-top: 80px;
   padding: 40px;
-  text-align: center;
+  min-height: calc(100vh - 80px);
 }
 
-.placeholder {
-  border: 2px dashed #da5e17;
-  padding: 60px;
-  border-radius: 12px;
-  background-color: #fff;
-  color: #8B5E3C;
-  font-weight: 600;
-}
-
-/* Tanggal dan jam */
-#today-date {
-  font-size: 18px;
-  color: #8B5E3C;
-  margin-bottom: 10px;
-}
-
-#clock {
-  font-size: 55px;
-  font-weight: 700;
-  color: #A46C4E;
-  letter-spacing: 2px;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
-}
-
-/* Logout */
 .logout-btn {
   display: block;
   background-color: #A46C4E;
@@ -269,7 +244,7 @@ body {
 <div class="sidebar">
   <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
 
-  <a href="dashboard.php" class="menu-link active" data-target="dashboard">
+  <a href="../pages/dashboard.php" class="menu-link active" data-target="dashboard">
     <i class="fa-solid fa-gauge-high"></i> Dashboard
   </a>
 
@@ -277,18 +252,18 @@ body {
     <i class="fa-solid fa-list-check"></i> To Do List
   </a>
   <div class="submenu" id="todo-submenu">
-    <a href="../todo/personal.php"><i class="fa-regular fa-circle"></i> Personal</a>
-    <a href="../todo/work.php"><i class="fa-regular fa-circle"></i> Work</a>
-    <a href="../todo/act.php"><i class="fa-regular fa-circle"></i> Activities</a>
+    <a href="../todo/personal.php">Personal</a>
+    <a href="../todo/work.php">Work</a>
+    <a href="../todo/act.php">Activities</a>
   </div>
 
   <a href="#" class="menu-link" data-target="notes">
     <i class="fa-solid fa-note-sticky"></i> Notes
   </a>
   <div class="submenu" id="notes-submenu">
-    <a href="../notes/personal.php"><i class="fa-regular fa-circle"></i> Personal</a>
-    <a href="../notes/work.php"><i class="fa-regular fa-circle"></i> Work</a>
-    <a href="../notes/act.php"><i class="fa-regular fa-circle"></i> Activities</a>
+    <a href="personal.php">Personal</a>
+    <a href="work.php">Work</a>
+    <a href="act.php">Activities</a>
   </div>
 
   <?php if (strtolower($role_name) === 'admin'): ?>
@@ -296,7 +271,7 @@ body {
     <i class="fa-solid fa-gear"></i> Master
   </a>
   <div class="submenu" id="master-submenu">
-    <a href="../master/list.php"><i class="fa-solid fa-user-gear"></i> User</a>
+    <a href="#"><i class="fa-solid fa-user-gear"></i> User</a>
   </div>
   <?php endif; ?>
 
@@ -308,7 +283,6 @@ body {
 </div>
 
 <div class="topbar">
-  <!-- 🌱 Logo Animasi Mini + Tagline -->
   <div class="sprinklist-logo d-flex align-items-center me-auto">
     <i class="fa-solid fa-seedling logo-icon"></i>
     <div class="tagline">
@@ -316,52 +290,28 @@ body {
       <span class="motto">Grow your day, one task at a time.</span>
     </div>
   </div>
-  <!-- End Logo -->
-
   <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
   <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
 </div>
 
-
-
+<!-- 🌼 KONTEN HALAMAN -->
 <div class="content">
-  <div id="today-date"></div>
-  <div id="clock"></div>
-
-  <h3 class="mt-4 mb-4">Selamat datang, <?= htmlspecialchars($username); ?> (<?= htmlspecialchars($role_name); ?>)</h3>
-
-  <div class="placeholder">
-    Konten dashboard belum diisi.
-  </div>
 </div>
 
 <script>
-
-  document.querySelectorAll('.menu-link').forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
+document.querySelectorAll('.menu-link').forEach(link => {
+  link.addEventListener('click', e => {
+    const submenu = document.getElementById(link.dataset.target + '-submenu');
+    
+    if (submenu) {
+      e.preventDefault(); // cuma cegah klik kalau ada submenu
       document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
       link.classList.add('active');
-      const submenu = document.getElementById(link.dataset.target + '-submenu');
       document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active-menu'));
-      if (submenu) submenu.classList.toggle('active-menu');
-    });
+      submenu.classList.toggle('active-menu');
+    }
   });
-
-
-  const today = new Date();
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  document.getElementById('today-date').textContent = today.toLocaleDateString('id-ID', options);
-
-  function updateClock() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
+});
 </script>
 
 </body>
