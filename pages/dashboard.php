@@ -12,9 +12,10 @@ $role_name = $_SESSION['role_name'];
 $user_id   = $_SESSION['user_id'];
 
 // === AJAX: Selesaikan To-Do + Catat Waktu ===
+// DIHAPUS: AND status != 'complete' → biar update selalu berhasil
 if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
   $todo_id = (int)$_POST['todo_id'];
-  $stmt = $conn->prepare("UPDATE todos SET status = 'complete', selesai_at = NOW() WHERE id = ? AND user_id = ? AND status != 'complete'");
+  $stmt = $conn->prepare("UPDATE todos SET status = 'complete', selesai_at = NOW() WHERE id = ? AND user_id = ?");
   $stmt->bind_param("ii", $todo_id, $user_id);
   $success = $stmt->execute();
   echo json_encode(['success' => $success]);
@@ -366,42 +367,42 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
 <body>
 
   <div class="sidebar">
-    <h4>Sprinklist</h4>
+    <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
 
-    <a href="../pages/das" class="menu-link active" data-target="dashboard">
-      Dashboard
+    <a href="../pages/dashboard.php" class="menu-link active" data-target="dashboard">
+      <i class="fa-solid fa-gauge-high"></i> Dashboard
     </a>
 
     <a href="#" class="menu-link" data-target="todo">
-      To Do List
+      <i class="fa-solid fa-list-check"></i> To Do List
     </a>
     <div class="submenu" id="todo-submenu">
-      <a href="../todo/personal.php">Personal</a>
-      <a href="../todo/work.php">Work</a>
-      <a href="../todo/act.php">Activities</a>
+      <a href="../todo/personal.php"><i class="fa-solid fa-user"></i> Personal</a>
+      <a href="../todo/work.php"><i class="fa-solid fa-briefcase"></i> Work</a>
+      <a href="../todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
     </div>
 
     <a href="#" class="menu-link" data-target="notes">
-      Notes
+      <i class="fa-solid fa-note-sticky"></i> Notes
     </a>
     <div class="submenu" id="notes-submenu">
-      <a href="../notes/personal.php">Personal</a>
-      <a href="../notes/work.php">Work</a>
-      <a href="../notes/act.php">Activities</a>
+      <a href="../notes/personal.php"><i class="fa-solid fa-user-pen"></i> Personal</a>
+      <a href="../notes/work.php"><i class="fa-solid fa-file-lines"></i> Work</a>
+      <a href="../notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
     </div>
 
     <?php if (strtolower($role_name) === 'admin'): ?>
       <a href="#" class="menu-link" data-target="master">
-        Master
+        <i class="fa-solid fa-gear"></i> Master
       </a>
       <div class="submenu" id="master-submenu">
-        <a href="../master/list.php">User</a>
+        <a href="../master/list.php"><i class="fa-solid fa-users-gear"></i> User</a>
       </div>
     <?php endif; ?>
 
     <div class="sidebar-footer">
       <a href="../logout.php" class="logout-btn">
-        Logout
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
       </a>
     </div>
   </div>
@@ -409,6 +410,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="sprinklist-logo d-flex align-items-center me-auto">
+      <i class="fa-solid fa-seedling logo-icon"></i>
       <div class="tagline">
         <span class="brand">Sprinklist</span>
         <span class="motto">Grow your day, one task at a time.</span>
@@ -416,9 +418,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     </div>
 
     <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
-    <div class="profile-icon"></div>
+    <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
   </div>
 
+  <!-- CONTENT -->
   <div class="content">
     <div class="text-center mb-5">
       <div id="today-date"></div>
@@ -426,13 +429,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
       <h3 class="mt-4">Selamat datang, <?= htmlspecialchars($username); ?> (<?= htmlspecialchars($role_name); ?>)</h3>
     </div>
 
+    <!-- TO-DO LIST HARI INI -->
     <div class="dashboard-card">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0 fw-bold text-brown">
-          To-Do List Hari Ini
+          <i class="fa-solid fa-list-check"></i> To-Do List Hari Ini
         </h4>
         <a href="../todo/tambah.php" class="btn btn-sm btn-outline-brown">
-          Tambah
+          <i class="fa-solid fa-plus"></i> Tambah
         </a>
       </div>
 
@@ -486,9 +490,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
                     <p class="text-muted small mb-2 text-truncate"><?= htmlspecialchars($t['description']) ?></p>
                   <?php endif; ?>
                   <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted"> <?= date('H:i', strtotime($t['created_at'])) ?></small>
+                    <small class="text-muted"><i class="fa-regular fa-clock"></i> <?= date('H:i', strtotime($t['created_at'])) ?></small>
                     <?php if ($t['status'] === 'complete' && $t['waktu_selesai']): ?>
-                      <small class="waktu-selesai"> <?= $t['waktu_selesai'] ?></small>
+                      <small class="waktu-selesai"><i class="fa-solid fa-check"></i> <?= $t['waktu_selesai'] ?></small>
                     <?php endif; ?>
                   </div>
                 </div>
@@ -503,10 +507,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
         <?php endif; ?>
       <?php else: ?>
         <div class="text-center py-5">
-          <div class="empty-icon mb-3"></div>
+          <div class="empty-icon mb-3"><i class="fa-solid fa-seedling fa-3x text-brown opacity-25"></i></div>
           <h5 class="text-brown mb-2">Belum ada tugas hari ini</h5>
           <p class="text-muted small">Mulai hari dengan menambahkan to-do!</p>
-          <a href="../todo/tambah.php" class="btn btn-brown btn-sm">Buat To-Do</a>
+          <a href="../todo/tambah.php" class="btn btn-brown btn-sm"><i class="fa-solid fa-plus"></i> Buat To-Do</a>
         </div>
       <?php endif; ?>
     </div>
@@ -515,10 +519,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     <div class="dashboard-card">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0 fw-bold text-brown">
-          Notes Terbaru
+          <i class="fa-solid fa-note-sticky"></i> Notes Terbaru
         </h4>
         <a href="../notes/tambah.php" class="btn btn-sm btn-outline-brown">
-          Tambah
+          <i class="fa-solid fa-plus"></i> Tambah
         </a>
       </div>
 
@@ -543,7 +547,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
                     <?= !empty($n['content']) ? htmlspecialchars($n['content']) : '<em>Tanpa isi</em>' ?>
                   </p>
                   <small class="text-muted d-block">
-                     <?= date('d M H:i', strtotime($n['created_at'])) ?>
+                    <i class="fa-regular fa-calendar"></i> <?= date('d M H:i', strtotime($n['created_at'])) ?>
                   </small>
                 </div>
               </div>
@@ -557,10 +561,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
         <?php endif; ?>
       <?php else: ?>
         <div class="text-center py-5">
-          <div class="empty-icon mb-3"></div>
+          <div class="empty-icon mb-3"><i class="fa-solid fa-sticky-note fa-3x text-brown opacity-25"></i></div>
           <h5 class="text-brown mb-2">Belum ada catatan</h5>
           <p class="text-muted small">Simpan ide atau pengingatmu!</p>
-          <a href="../notes/tambah.php" class="btn btn-brown btn-sm">Buat Note</a>
+          <a href="../notes/tambah.php" class="btn btn-brown btn-sm"><i class="fa-solid fa-plus"></i> Buat Note</a>
         </div>
       <?php endif; ?>
     </div>
@@ -594,7 +598,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     setInterval(updateClock, 1000);
     updateClock();
 
-    // === PERBAIKAN UTAMA: JANGAN PASANG EVENT PADA TOMBOL YANG SUDAH SELESAI ===
+    // === PERBAIKAN: Hanya pasang event pada tombol yang belum selesai ===
     document.querySelectorAll('.btn-complete').forEach(btn => {
       if (btn.disabled || btn.classList.contains('completed')) return;
 
@@ -626,11 +630,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
             if (!timeEl) {
               const div = document.createElement('div');
               div.className = 'd-flex justify-content-between align-items-center';
-              div.innerHTML = `<small class="text-muted"> ${card.querySelector('.text-muted').innerText.split(' ')[1]}</small>
-                               <small class="waktu-selesai"> ${time}</small>`;
+              div.innerHTML = `<small class="text-muted"><i class="fa-regular fa-clock"></i> ${card.querySelector('.text-muted').innerText.split(' ')[1]}</small>
+                               <small class="waktu-selesai"><i class="fa-solid fa-check"></i> ${time}</small>`;
               card.querySelector('.card-body > div:last-child').replaceWith(div);
             } else {
-              timeEl.innerHTML = ` ${time}`;
+              timeEl.innerHTML = `<i class="fa-solid fa-check"></i> ${time}`;
             }
 
             const completed = parseInt(document.getElementById('completed-count').textContent) + 1;
