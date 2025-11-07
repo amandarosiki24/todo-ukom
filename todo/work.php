@@ -248,16 +248,54 @@ body {
     <i class="fa-solid fa-gauge-high"></i> Dashboard
   </a>
 
-  <a href="#" class="menu-link" data-target="todo">
-    <i class="fa-solid fa-list-check"></i> To Do List
-  </a>
+   <div class="sidebar">
+    <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
+
+    <a href="dashboard.php" class="menu-link active" data-target="dashboard">
+      <i class="fa-solid fa-gauge-high"></i> Dashboard
+    </a>
+
+    <a href="#" class="menu-link" data-target="todo">
+      <i class="fa-solid fa-list-check"></i> To Do List
+    </a>
+    <div class="submenu" id="todo-submenu">
+      <a href="../todo/personal.php"><i class="fa-solid fa-user"></i> Personal</a>
+      <a href="../todo/work.php"><i class="fa-solid fa-briefcase"></i> Work</a>
+      <a href="../todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
+    </div>
+
+    <a href="#" class="menu-link" data-target="notes">
+      <i class="fa-solid fa-note-sticky"></i> Notes
+    </a>
+    <div class="submenu" id="notes-submenu">
+      <a href="../notes/personal.php"><i class="fa-solid fa-user-pen"></i> Personal</a>
+      <a href="../notes/work.php"><i class="fa-solid fa-file-lines"></i> Work</a>
+      <a href="../notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
+    </div>
+
+    <?php if (strtolower($role_name) === 'admin'): ?>
+      <a href="#" class="menu-link" data-target="master">
+        <i class="fa-solid fa-gear"></i> Master
+      </a>
+      <div class="submenu" id="master-submenu">
+        <a href="../master/list.php"><i class="fa-solid fa-users-gear"></i> User</a>
+      </div>
+    <?php endif; ?>
+
+    <div class="sidebar-footer">
+      <a href="../logout.php" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </a>
+    </div>
+  </div>
+
   <div class="submenu" id="todo-submenu">
     <a href="../todo/personal.php">Personal</a>
     <a href="../todo/work.php">Work</a>
     <a href="../todo/act.php">Activities</a>
   </div>
 
-  <a href="#" class="menu-link" data-target="notes">
+  <a href="../notes/personal.php" class="menu-link" data-target="notes">
     <i class="fa-solid fa-note-sticky"></i> Notes
   </a>
   <div class="submenu" id="notes-submenu">
@@ -271,7 +309,7 @@ body {
     <i class="fa-solid fa-gear"></i> Master
   </a>
   <div class="submenu" id="master-submenu">
-    <a href="#"><i class="fa-solid fa-user-gear"></i> User</a>
+    <a href="../master/list.php"><i class="fa-solid fa-user-gear"></i> User</a>
   </div>
   <?php endif; ?>
 
