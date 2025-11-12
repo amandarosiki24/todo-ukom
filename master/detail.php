@@ -191,10 +191,24 @@ $role_name = $_SESSION['role_name'] ?? '';
             <i class="fa-solid fa-seedling logo-icon"></i>
             <div><div class="brand">Sprinklist</div><div class="motto">Grow your day, one task at a time.</div></div>
         </div>
-        <div class="user-section" onclick="window.location.href='pages/profile.php'">
-            <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
-            <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
+        <div class="user-section">
+      <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
+      <a href="../pages/profile.php" class="profile-link">
+        <div class="profile-icon">
+          <?php
+          $ava_file = $_SESSION['ava'] ?? 'default.png';
+          $full_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $ava_file;
+          $web_path = '/uploads/avatars/' . $ava_file;
+
+          if (file_exists($full_path) && !empty($ava_file)) {
+            echo '<img src="' . htmlspecialchars($web_path) . '" alt="Avatar" class="avatar-img">';
+          } else {
+            echo '<i class="fa-solid fa-user"></i>';
+          }
+          ?>
         </div>
+      </a>
+    </div>
     </div>
 
     <div class="content">

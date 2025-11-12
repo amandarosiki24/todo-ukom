@@ -6,7 +6,6 @@ if (!isset($_SESSION['user_id'])) {
   header("Location: ../index.php");
   exit;
 }
-
 $username  = $_SESSION['username'];
 $role_name = $_SESSION['role_name'] ?? '';
 
@@ -14,8 +13,6 @@ if (strtolower($role_name) !== 'admin') {
   echo "<script>alert('Akses ditolak! Hanya admin yang bisa mengakses halaman ini.'); window.location='../pages/dashboard.php';</script>";
   exit;
 }
-
-// proses delete user
 $message = '';
 $message_type = '';
 
@@ -85,6 +82,7 @@ $result = $conn->query($sql);
       color: #333;
       overflow-x: hidden;
     }
+
     .sidebar {
       width: 250px;
       height: 100vh;
@@ -119,13 +117,12 @@ $result = $conn->query($sql);
       color: #f9b6a5;
       animation: bloom 1.6s ease-in-out forwards;
     }
-    
+
     @keyframes bloom {
       0% { transform: scale(0) rotate(-45deg); opacity: 0; }
       60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
       100% { transform: scale(1) rotate(0); }
     }
-
 
     .sidebar .menu-link {
       display: flex;
@@ -164,6 +161,7 @@ $result = $conn->query($sql);
     .sidebar .menu-link.active.has-submenu::after {
       transform: rotate(180deg);
     }
+
     .submenu {
       background-color: #fbe7e7;
       max-height: 0;
@@ -178,7 +176,9 @@ $result = $conn->query($sql);
       max-height: 300px;
       opacity: 1;
       padding: 8px 0;
-    }.submenu a {
+    }
+
+    .submenu a {
       display: block;
       color: var(--secondary);
       padding: 8px 20px 8px 57px;
@@ -190,13 +190,14 @@ $result = $conn->query($sql);
     .submenu a i {
       margin-right: 8px;
       font-size: 0.8rem;
-      color: #da5e17;
+      color: #A46C4E;
     }
 
     .submenu a:hover {
       background-color: #f8d7d7;
       color: #7a4e2f;
     }
+
     .sidebar-footer {
       position: absolute;
       bottom: 20px;
@@ -216,6 +217,7 @@ $result = $conn->query($sql);
       font-weight: 600;
       transition: 0.3s;
     }
+
     .logout-btn:hover {
       background-color: rgba(255, 255, 255, 0.1);
       color: #fff;
@@ -224,6 +226,7 @@ $result = $conn->query($sql);
     .logout-btn i {
       margin-right: 10px;
     }
+
     .topbar {
       height: 65px;
       background-color: var(--dark);
@@ -279,16 +282,17 @@ $result = $conn->query($sql);
       margin-top: -2px;
     }
 
+    /* USER SECTION: Hi, user + Avatar */
     .user-section {
       display: flex;
       align-items: center;
       gap: 12px;
-      cursor: pointer;
     }
 
     .username {
       font-weight: 600;
       font-size: 1rem;
+      white-space: nowrap;
     }
 
     .profile-icon {
@@ -299,8 +303,7 @@ $result = $conn->query($sql);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-size: 1.1rem;
+      overflow: hidden;
       box-shadow: 0 2px 5px rgba(0,0,0,0.15);
       transition: all 0.3s ease;
     }
@@ -310,6 +313,14 @@ $result = $conn->query($sql);
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
 
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    /* CONTENT */
     .content {
       margin-left: 250px;
       margin-top: 80px;
@@ -344,6 +355,7 @@ $result = $conn->query($sql);
     .btn-add:hover {
       background-color: #7a4e2f;
     }
+
     .table-container {
       background: #fff;
       border-radius: 12px;
@@ -372,37 +384,19 @@ $result = $conn->query($sql);
       margin: 0 4px;
     }
 
-    .btn-detail {
-      background-color: #4CAF50;
-      color: #fff;
-    }
-
-    .btn-detail:hover {
-      background-color: #388E3C;
-    }
-
-    .btn-edit {
-      background-color: var(--accent);
-      color: #fff;
-    }
-
-    .btn-edit:hover {
-      background-color: #E39E5D;
-    }
-    .btn-delete {
-      background-color: var(--danger);
-      color: #fff;
-    }
-
-    .btn-delete:hover {
-      background-color: #C62828;
-    }
+    .btn-detail { background-color: #4CAF50; color: #fff; }
+    .btn-detail:hover { background-color: #388E3C; }
+    .btn-edit { background-color: var(--accent); color: #fff; }
+    .btn-edit:hover { background-color: #E39E5D; }
+    .btn-delete { background-color: var(--danger); color: #fff; }
+    .btn-delete:hover { background-color: #C62828; }
 
     .badge {
       font-size: 0.8rem;
       padding: 6px 10px;
       border-radius: 20px;
     }
+
     .sidebar::-webkit-scrollbar {
       width: 6px;
     }
@@ -413,6 +407,7 @@ $result = $conn->query($sql);
     .sidebar::-webkit-scrollbar-track {
       background-color: #e7c9b3;
     }
+    
     @media (max-width: 992px) {
       .sidebar {
         transform: translateX(-100%);
@@ -424,10 +419,50 @@ $result = $conn->query($sql);
         transform: translateX(0);
       }
     }
+
+    @media (max-width: 576px) {
+      .user-section {
+        gap: 8px;
+      }
+      .username {
+        font-size: 0.9rem;
+      }
+      .profile-icon {
+        width: 36px;
+        height: 36px;
+      }
+      .topbar {
+        padding: 0 15px;
+      }
+    }
+    .sidebar i,
+    .topbar i,
+    .logout-btn i,
+    .profile-icon i,
+    .page-title i,
+    .btn-add i,
+    .btn-detail i,
+    .btn-edit i,
+    .btn-delete i,
+    .btn-secondary i {
+      color: white !important;
+    }
+
+    .sidebar .menu-link:hover i,
+    .submenu a:hover i,
+    .logout-btn:hover i {
+      color: white !important;
+    }
+
+    .logo-icon {
+      color: #f9b6a5 !important;
+    }
+    #master-submenu a i {
+      color: #A46C4E !important;
+    }
   </style>
 </head>
 <body>
-
   <div class="sidebar">
     <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
 
@@ -477,9 +512,24 @@ $result = $conn->query($sql);
         <div class="motto">Grow your day, one task at a time.</div>
       </div>
     </div>
-    <div class="user-section" onclick="window.location.href='../pages/profile.php'">
+
+    <div class="user-section">
       <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
-      <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
+      <a href="../pages/profile.php" class="profile-link">
+        <div class="profile-icon">
+          <?php
+          $ava_file = $_SESSION['ava'] ?? 'default.png';
+          $full_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $ava_file;
+          $web_path = '/uploads/avatars/' . $ava_file;
+
+          if (file_exists($full_path) && !empty($ava_file)) {
+            echo '<img src="' . htmlspecialchars($web_path) . '" alt="Avatar" class="avatar-img">';
+          } else {
+            echo '<i class="fa-solid fa-user"></i>';
+          }
+          ?>
+        </div>
+      </a>
     </div>
   </div>
 
@@ -525,21 +575,14 @@ $result = $conn->query($sql);
                   </td>
                   <td><?= date('d M Y', strtotime($row['created_at'])); ?></td>
                   <td>
-                    <a href="../master/detail.php?id=<?= $row['id']; ?>" 
-                       class="btn btn-sm btn-detail" 
-                       title="Detail Profile">
+                    <a href="../master/detail.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-detail" title="Detail">
                       <i class="fa-solid fa-eye"></i>
                     </a>
-                    <a href="../master/edit.php?id=<?= $row['id']; ?>" 
-                       class="btn btn-sm btn-edit" 
-                       title="Edit">
+                    <a href="../master/edit.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-edit" title="Edit">
                       <i class="fa-solid fa-pen-to-square"></i>
                     </a>
-
                     <?php if ($row['id'] != $_SESSION['user_id']): ?>
-                      <a href="?delete_id=<?= $row['id']; ?>" 
-                         class="btn btn-sm btn-delete" 
-                         title="Hapus"
+                      <a href="?delete_id=<?= $row['id']; ?>" class="btn btn-sm btn-delete" title="Hapus"
                          onclick="return confirm('Yakin ingin menghapus user <?= htmlspecialchars($row['username']); ?>?')">
                         <i class="fa-solid fa-trash"></i>
                       </a>
@@ -561,7 +604,6 @@ $result = $conn->query($sql);
       </div>
     </div>
   </div>
-
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const menuLinks = document.querySelectorAll('.menu-link.has-submenu');
@@ -569,13 +611,13 @@ $result = $conn->query($sql);
       menuLinks.forEach(link => {
         link.addEventListener('click', function (e) {
           e.preventDefault();
-
           const target = this.dataset.target;
           const submenu = document.getElementById(target + '-submenu');
           const isActive = this.classList.contains('active');
 
           document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
           document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active'));
+
           if (!isActive && submenu) {
             this.classList.add('active');
             submenu.classList.add('active');
@@ -583,7 +625,6 @@ $result = $conn->query($sql);
         });
       });
 
-      // Highlight active master menu
       const currentFile = window.location.pathname.split('/').pop();
       const masterFiles = ['list.php', 'detail.php', 'edit.php', 'add-user.php'];
       if (masterFiles.includes(currentFile)) {
