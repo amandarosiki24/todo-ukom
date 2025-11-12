@@ -243,16 +243,13 @@ $base_url = '/todo-27rplb-b11-ukom';
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
 
-  <!-- Dashboard -->
   <a href="pages/dashboard.php" class="menu-link" data-target="dashboard">
     <i class="fa-solid fa-gauge-high"></i> Dashboard
   </a>
 
-  <!-- To Do List -->
   <a href="javascript:void(0)" class="menu-link" data-target="todo">
     <i class="fa-solid fa-list-check"></i> To Do List
   </a>
@@ -272,7 +269,6 @@ $base_url = '/todo-27rplb-b11-ukom';
     <a href="notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
   </div>
 
-  <!-- Master (Admin Only) -->
   <?php if (strtolower($role_name) === 'admin'): ?>
     <a href="javascript:void(0)" class="menu-link" data-target="master">
       <i class="fa-solid fa-gear"></i> Master
@@ -282,7 +278,6 @@ $base_url = '/todo-27rplb-b11-ukom';
     </div>
   <?php endif; ?>
 
-  <!-- Logout -->
   <div class="sidebar-footer">
     <a href="logout.php" class="logout-btn">
       <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -290,7 +285,6 @@ $base_url = '/todo-27rplb-b11-ukom';
   </div>
 </div>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="sprinklist-logo d-flex align-items-center me-auto">
     <i class="fa-solid fa-seedling logo-icon"></i>

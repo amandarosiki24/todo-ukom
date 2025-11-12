@@ -174,6 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 4px solid #DF6D99;
             background-color: #f8e9e5;
             display: flex;
+        
             justify-content: center;
             align-items: center;
             overflow: hidden;
