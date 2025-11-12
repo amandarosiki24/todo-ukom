@@ -239,7 +239,7 @@ $conn->close();
         </div>
         <button type="submit" class="btn btn-register w-100">Login</button>
         <p class="text-center mt-3 mb-0">
-          Belum punya akun? <a href="pages/register.php" class="text-primary fw-semibold">Daftar di sini</a>
+          Belum punya akun? <a href="register.php" class="text-primary fw-semibold">Daftar di sini</a>
         </p>
       </form>
     </div>

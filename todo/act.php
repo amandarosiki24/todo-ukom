@@ -9,19 +9,17 @@ if (!isset($_SESSION['user_id'])) {
 
 $username  = $_SESSION['username'];
 $role_name = $_SESSION['role_name'];
-
-// Tentukan base URL (sesuaikan dengan nama folder utama di XAMPP)
-$base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
+$base_url = '/todo-27rplb-b11-ukom';
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sprinklist - Template</title>
+  <title>Sprinklist-Todo-Activity</title>
 
-  <!-- Base URL untuk path konsisten -->
   <base href="<?= $base_url ?>/">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -45,7 +43,7 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
       left: 0;
       padding-top: 25px;
       overflow-y: auto;
-      box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+      box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar h4 {
@@ -57,8 +55,15 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     }
 
     @keyframes fadeSlideIn {
-      0% { opacity: 0; transform: translateY(-15px) scale(0.9); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
+      0% {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.9);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .sidebar h4 i {
@@ -68,9 +73,19 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     }
 
     @keyframes bloom {
-      0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-      60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-      100% { transform: scale(1) rotate(0); }
+      0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+      }
+
+      60% {
+        transform: scale(1.2) rotate(10deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1) rotate(0);
+      }
     }
 
     .sidebar a {
@@ -90,7 +105,8 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
       margin-right: 10px;
     }
 
-    .sidebar a:hover, .sidebar a.active {
+    .sidebar a:hover,
+    .sidebar a.active {
       background-color: #A46C4E;
       border-left: 4px solid #fff;
     }
@@ -173,14 +189,29 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     }
 
     @keyframes fadeInLogo {
-      from { opacity: 0; transform: translateX(-15px); }
-      to { opacity: 1; transform: translateX(0); }
+      from {
+        opacity: 0;
+        transform: translateX(-15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     @keyframes bounceGrow {
-      0% { transform: scale(1) translateY(0); }
-      50% { transform: scale(1.1) translateY(-2px); }
-      100% { transform: scale(1) translateY(0); }
+      0% {
+        transform: scale(1) translateY(0);
+      }
+
+      50% {
+        transform: scale(1.1) translateY(-2px);
+      }
+
+      100% {
+        transform: scale(1) translateY(0);
+      }
     }
 
     .topbar .username {
@@ -200,7 +231,7 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
       justify-content: center;
       color: white;
       font-size: 18px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     }
 
     .content {
@@ -236,130 +267,130 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     .sidebar::-webkit-scrollbar {
       width: 6px;
     }
+
     .sidebar::-webkit-scrollbar-thumb {
       background-color: #A46C4E;
       border-radius: 3px;
     }
+
     .sidebar::-webkit-scrollbar-track {
       background-color: #e7c9b3;
     }
   </style>
 </head>
+
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
-
-  <!-- Dashboard -->
-  <a href="pages/dashboard.php" class="menu-link" data-target="dashboard">
-    <i class="fa-solid fa-gauge-high"></i> Dashboard
-  </a>
-
-  <!-- To Do List -->
-  <a href="javascript:void(0)" class="menu-link" data-target="todo">
-    <i class="fa-solid fa-list-check"></i> To Do List
-  </a>
-  <div class="submenu" id="todo-submenu">
-    <a href="todo/personal.php"><i class="fa-solid fa-user"></i> Personal</a>
-    <a href="todo/work.php"><i class="fa-solid fa-briefcase"></i> Work</a>
-    <a href="todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
-  </div>
-
-  <!-- Notes -->
-  <a href="javascript:void(0)" class="menu-link" data-target="notes">
-    <i class="fa-solid fa-note-sticky"></i> Notes
-  </a>
-  <div class="submenu" id="notes-submenu">
-    <a href="notes/personal.php"><i class="fa-solid fa-user-pen"></i> Personal</a>
-    <a href="notes/work.php"><i class="fa-solid fa-file-lines"></i> Work</a>
-    <a href="notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
-  </div>
-
-  <!-- Master (Admin Only) -->
-  <?php if (strtolower($role_name) === 'admin'): ?>
-    <a href="javascript:void(0)" class="menu-link" data-target="master">
-      <i class="fa-solid fa-gear"></i> Master
+  <div class="sidebar">
+    <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
+    <a href="pages/dashboard.php" class="menu-link" data-target="dashboard">
+      <i class="fa-solid fa-gauge-high"></i> Dashboard
     </a>
-    <div class="submenu" id="master-submenu">
-      <a href="master/list.php"><i class="fa-solid fa-users-gear"></i> User</a>
+
+    <a href="javascript:void(0)" class="menu-link" data-target="todo">
+      <i class="fa-solid fa-list-check"></i> To Do List
+    </a>
+    <div class="submenu" id="todo-submenu">
+      <a href="todo/personal.php"><i class="fa-solid fa-user"></i> Personal</a>
+      <a href="todo/work.php"><i class="fa-solid fa-briefcase"></i> Work</a>
+      <a href="todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
     </div>
-  <?php endif; ?>
 
-  <!-- Logout -->
-  <div class="sidebar-footer">
-    <a href="logout.php" class="logout-btn">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    <a href="javascript:void(0)" class="menu-link" data-target="notes">
+      <i class="fa-solid fa-note-sticky"></i> Notes
     </a>
-  </div>
-</div>
+    <div class="submenu" id="notes-submenu">
+      <a href="notes/personal.php"><i class="fa-solid fa-user-pen"></i> Personal</a>
+      <a href="notes/work.php"><i class="fa-solid fa-file-lines"></i> Work</a>
+      <a href="notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
+    </div>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="sprinklist-logo d-flex align-items-center me-auto">
-    <i class="fa-solid fa-seedling logo-icon"></i>
-    <div class="tagline">
-      <span class="brand">Sprinklist</span>
-      <span class="motto">Grow your day, one task at a time.</span>
+    <?php if (strtolower($role_name) === 'admin'): ?>
+      <a href="javascript:void(0)" class="menu-link" data-target="master">
+        <i class="fa-solid fa-gear"></i> Master
+      </a>
+      <div class="submenu" id="master-submenu">
+        <a href="master/list.php"><i class="fa-solid fa-users-gear"></i> User</a>
+      </div>
+    <?php endif; ?>
+
+    <div class="sidebar-footer">
+      <a href="logout.php" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </a>
     </div>
   </div>
-  <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
-  <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
-</div>
 
-<!-- CONTENT -->
-<div class="content">
-  <!-- Isi halaman kamu di sini -->
-</div>
+  <div class="topbar">
+    <div class="sprinklist-logo d-flex align-items-center me-auto">
+      <i class="fa-solid fa-seedling logo-icon"></i>
+      <div class="tagline">
+        <span class="brand">Sprinklist</span>
+        <span class="motto">Grow your day, one task at a time.</span>
+      </div>
+    </div>
+    <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
+    <a href="pages/profile.php" class="profile-link">
+      <div class="profile-icon">
+        <?php
+        $ava_file = $_SESSION['ava'] ?? 'default.png';
+        $ava_path = 'uploads/avatars/' . $ava_file;
+        $full_path = $_SERVER['DOCUMENT_ROOT'] . $base_url . '/' . $ava_path;
 
-<!-- JavaScript -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const currentPath = window.location.pathname;
-    const menuLinks = document.querySelectorAll('.menu-link');
-    let activeTarget = null;
-
-    // Deteksi halaman aktif
-    if (currentPath.includes('pages/dashboard.php')) {
-      activeTarget = 'dashboard';
-    } else if (currentPath.includes('/todo/')) {
-      activeTarget = 'todo';
-    } else if (currentPath.includes('/notes/')) {
-      activeTarget = 'notes';
-    } else if (currentPath.includes('master/list.php')) {
-      activeTarget = 'master';
-    }
-
-    // Set active class (TANPA membuka submenu otomatis)
-    menuLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.dataset.target === activeTarget) {
-        link.classList.add('active');
-      }
-    });
-
-    // Toggle submenu saat klik
-    menuLinks.forEach(link => {
-      link.addEventListener('click', function (e) {
-        const target = this.dataset.target;
-        const submenu = document.getElementById(target + '-submenu');
-
-        if (submenu) {
-          e.preventDefault();
-
-          // Hapus semua active
-          menuLinks.forEach(l => l.classList.remove('active'));
-          document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active-menu'));
-
-          // Aktifkan yang diklik
-          this.classList.add('active');
-          submenu.classList.add('active-menu');
+        if (file_exists($full_path) && !empty($ava_file)) {
+          echo '<img src="' . htmlspecialchars($ava_path) . '" alt="Avatar" class="avatar-img">';
+        } else {
+          echo '<i class="fa-solid fa-user"></i>';
         }
-        // Jika tidak ada submenu (Dashboard), biarkan pindah halaman
+        ?>
+      </div>
+    </a>
+  </div>
+
+  <div class="content">
+    <!-- Isi halaman kamu di sini -->
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPath = window.location.pathname;
+      const menuLinks = document.querySelectorAll('.menu-link');
+      let activeTarget = null;
+
+      if (currentPath.includes('pages/dashboard.php')) {
+        activeTarget = 'dashboard';
+      } else if (currentPath.includes('/todo/')) {
+        activeTarget = 'todo';
+      } else if (currentPath.includes('/notes/')) {
+        activeTarget = 'notes';
+      } else if (currentPath.includes('master/list.php')) {
+        activeTarget = 'master';
+      }
+
+      menuLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.target === activeTarget) {
+          link.classList.add('active');
+        }
+      });
+
+      menuLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          const target = this.dataset.target;
+          const submenu = document.getElementById(target + '-submenu');
+
+          if (submenu) {
+            e.preventDefault();
+            menuLinks.forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active-menu'));
+            this.classList.add('active');
+            submenu.classList.add('active-menu');
+          }
+        });
       });
     });
-  });
-</script>
+  </script>
 
 </body>
+
 </html>

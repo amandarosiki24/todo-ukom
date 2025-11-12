@@ -10,8 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $username  = $_SESSION['username'];
 $role_name = $_SESSION['role_name'];
 
-// Tentukan base URL (sesuaikan dengan nama folder utama di XAMPP)
-$base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
+$base_url = '/todo-27rplb-b11-ukom'; 
 ?>
 
 <!DOCTYPE html>
@@ -19,9 +18,7 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sprinklist - Template</title>
-
-  <!-- Base URL untuk path konsisten -->
+  <title>Sprinklist-Notes-Work</title>
   <base href="<?= $base_url ?>/">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -247,16 +244,12 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
-
-  <!-- Dashboard -->
   <a href="pages/dashboard.php" class="menu-link" data-target="dashboard">
     <i class="fa-solid fa-gauge-high"></i> Dashboard
   </a>
 
-  <!-- To Do List -->
   <a href="javascript:void(0)" class="menu-link" data-target="todo">
     <i class="fa-solid fa-list-check"></i> To Do List
   </a>
@@ -266,7 +259,6 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     <a href="todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
   </div>
 
-  <!-- Notes -->
   <a href="javascript:void(0)" class="menu-link" data-target="notes">
     <i class="fa-solid fa-note-sticky"></i> Notes
   </a>
@@ -276,7 +268,6 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     <a href="notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
   </div>
 
-  <!-- Master (Admin Only) -->
   <?php if (strtolower($role_name) === 'admin'): ?>
     <a href="javascript:void(0)" class="menu-link" data-target="master">
       <i class="fa-solid fa-gear"></i> Master
@@ -286,7 +277,6 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     </div>
   <?php endif; ?>
 
-  <!-- Logout -->
   <div class="sidebar-footer">
     <a href="logout.php" class="logout-btn">
       <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -294,7 +284,6 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
   </div>
 </div>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="sprinklist-logo d-flex align-items-center me-auto">
     <i class="fa-solid fa-seedling logo-icon"></i>
@@ -303,23 +292,33 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
       <span class="motto">Grow your day, one task at a time.</span>
     </div>
   </div>
-  <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
-  <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
+ <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
+    <a href="pages/profile.php" class="profile-link">
+      <div class="profile-icon">
+        <?php
+        $ava_file = $_SESSION['ava'] ?? 'default.png';
+        $ava_path = 'uploads/avatars/' . $ava_file;
+        $full_path = $_SERVER['DOCUMENT_ROOT'] . $base_url . '/' . $ava_path;
+
+        if (file_exists($full_path) && !empty($ava_file)) {
+          echo '<img src="' . htmlspecialchars($ava_path) . '" alt="Avatar" class="avatar-img">';
+        } else {
+          echo '<i class="fa-solid fa-user"></i>';
+        }
+        ?>
+      </div>
+    </a>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
   <!-- Isi halaman kamu di sini -->
 </div>
 
-<!-- JavaScript -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const currentPath = window.location.pathname;
     const menuLinks = document.querySelectorAll('.menu-link');
     let activeTarget = null;
-
-    // Deteksi halaman aktif
     if (currentPath.includes('pages/dashboard.php')) {
       activeTarget = 'dashboard';
     } else if (currentPath.includes('/todo/')) {
@@ -329,16 +328,12 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
     } else if (currentPath.includes('master/list.php')) {
       activeTarget = 'master';
     }
-
-    // Set active class (TANPA membuka submenu otomatis)
     menuLinks.forEach(link => {
       link.classList.remove('active');
       if (link.dataset.target === activeTarget) {
         link.classList.add('active');
       }
     });
-
-    // Toggle submenu saat klik
     menuLinks.forEach(link => {
       link.addEventListener('click', function (e) {
         const target = this.dataset.target;
@@ -346,16 +341,11 @@ $base_url = '/todo-27rplb-b11-ukom'; // GANTI SESUAI NAMA FOLDER PROYEKMU
 
         if (submenu) {
           e.preventDefault();
-
-          // Hapus semua active
           menuLinks.forEach(l => l.classList.remove('active'));
           document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active-menu'));
-
-          // Aktifkan yang diklik
           this.classList.add('active');
           submenu.classList.add('active-menu');
         }
-        // Jika tidak ada submenu (Dashboard), biarkan pindah halaman
       });
     });
   });

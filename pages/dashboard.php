@@ -10,9 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 $username  = $_SESSION['username'];
 $role_name = $_SESSION['role_name'];
 $user_id   = $_SESSION['user_id'];
-
-// === AJAX: Selesaikan To-Do + Catat Waktu ===
-// DIHAPUS: AND status != 'complete' → biar update selalu berhasil
 if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
   $todo_id = (int)$_POST['todo_id'];
   $stmt = $conn->prepare("UPDATE todos SET status = 'complete', selesai_at = NOW() WHERE id = ? AND user_id = ?");
@@ -64,8 +61,15 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     }
 
     @keyframes fadeSlideIn {
-      0% { opacity: 0; transform: translateY(-15px) scale(0.9); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
+      0% {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.9);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .sidebar h4 i {
@@ -75,15 +79,26 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     }
 
     @keyframes bloom {
-      0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-      60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-      100% { transform: scale(1) rotate(0); }
+      0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+      }
+
+      60% {
+        transform: scale(1.2) rotate(10deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1) rotate(0);
+      }
     }
 
     .sidebar a {
       display: flex;
       align-items: center;
-      color: #fff; padding: 10px 20px;
+      color: #fff;
+      padding: 10px 20px;
       text-decoration: none;
       font-weight: 500;
       transition: all 0.3s ease;
@@ -180,14 +195,29 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     }
 
     @keyframes fadeInLogo {
-      from { opacity: 0; transform: translateX(-15px); }
-      to { opacity: 1; transform: translateX(0); }
+      from {
+        opacity: 0;
+        transform: translateX(-15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     @keyframes bounceGrow {
-      0% { transform: scale(1) translateY(0); }
-      50% { transform: scale(1.1) translateY(-2px); }
-      100% { transform: scale(1) translateY(0); }
+      0% {
+        transform: scale(1) translateY(0);
+      }
+
+      50% {
+        transform: scale(1.1) translateY(-2px);
+      }
+
+      100% {
+        transform: scale(1) translateY(0);
+      }
     }
 
     .topbar .username {
@@ -276,7 +306,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
       margin-bottom: 24px;
     }
 
-    .text-brown { color: #8B5E3C; }
+    .text-brown {
+      color: #8B5E3C;
+    }
+
     .btn-brown {
       background-color: #A46C4E;
       color: white;
@@ -286,16 +319,19 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
       font-size: 0.875rem;
       transition: all 0.3s ease;
     }
+
     .btn-brown:hover {
       background-color: #7a4e2f;
       transform: translateY(-1px);
     }
+
     .btn-outline-brown {
       border: 1.5px solid #A46C4E;
       color: #A46C4E;
       font-size: 0.875rem;
       border-radius: 8px;
     }
+
     .btn-outline-brown:hover {
       background-color: #A46C4E;
       color: white;
@@ -305,14 +341,23 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
       opacity: 0;
       animation: fadeUp 0.5s ease forwards;
     }
+
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .hover-lift {
       transition: all 0.3s ease;
     }
+
     .hover-lift:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 20px rgba(139, 94, 60, 0.15) !important;
@@ -321,9 +366,17 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     .empty-icon i {
       animation: float 3s ease-in-out infinite;
     }
+
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
 
     .note-content {
@@ -348,10 +401,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
       border-radius: 6px;
       transition: all 0.2s ease;
     }
+
     .btn-complete:hover {
       background-color: #f3d1c8;
       color: #7a4e2f;
     }
+
     .btn-complete.completed {
       color: #28a745;
     }
@@ -407,7 +462,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     </div>
   </div>
 
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="sprinklist-logo d-flex align-items-center me-auto">
       <i class="fa-solid fa-seedling logo-icon"></i>
@@ -418,10 +472,24 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     </div>
 
     <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
-    <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
+<a href="profile.php" class="profile-link">
+  <div class="profile-icon">
+    <?php
+    // Ambil avatar dari session (atau default)
+    $ava_file = $_SESSION['ava'] ?? 'default.png';
+    $ava_path = '../uploads/avatars/' . $ava_file; // naik 1 folder dari /pages/
+
+    if (!empty($ava_file) && file_exists(__DIR__ . '/../uploads/avatars/' . $ava_file)) {
+      echo '<img src="' . htmlspecialchars($ava_path) . '" alt="Avatar" class="avatar-img">';
+    } else {
+      echo '<i class="fa-solid fa-user"></i>';
+    }
+    ?>
+  </div>
+</a>
+
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
     <div class="text-center mb-5">
       <div id="today-date"></div>
@@ -429,7 +497,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
       <h3 class="mt-4">Selamat datang, <?= htmlspecialchars($username); ?> (<?= htmlspecialchars($role_name); ?>)</h3>
     </div>
 
-    <!-- TO-DO LIST HARI INI -->
     <div class="dashboard-card">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0 fw-bold text-brown">
@@ -465,9 +532,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
           <span><strong><?= $total_todo ?></strong> total</span>
         </div>
         <div class="progress" style="height: 10px; border-radius: 10px; background-color: #f3d1c8;">
-          <div class="progress-bar" id="progress-bar" role="progressbar" 
-               style="width: <?= $progress_todo ?>%; background: linear-gradient(90deg, #A46C4E, #da5e17); border-radius: 10px;"
-               aria-valuenow="<?= $progress_todo ?>" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar" id="progress-bar" role="progressbar"
+            style="width: <?= $progress_todo ?>%; background: linear-gradient(90deg, #A46C4E, #da5e17); border-radius: 10px;"
+            aria-valuenow="<?= $progress_todo ?>" aria-valuemin="0" aria-valuemax="100">
           </div>
         </div>
         <small class="text-muted d-block mt-1 text-end" id="progress-text"><?= round($progress_todo) ?>% tercapai</small>
@@ -481,8 +548,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
                 <div class="card-body p-3">
                   <div class="d-flex justify-content-between align-items-start mb-2">
                     <h6 class="fw-bold text-brown text-truncate" style="max-width: 160px;"><?= htmlspecialchars($t['title']) ?></h6>
-                    <button class="btn-complete <?= $t['status'] === 'complete' ? 'completed' : '' ?>" 
-                            data-id="<?= $t['id'] ?>" <?= $t['status'] === 'complete' ? 'disabled' : '' ?>>
+                    <button class="btn-complete <?= $t['status'] === 'complete' ? 'completed' : '' ?>"
+                      data-id="<?= $t['id'] ?>" <?= $t['status'] === 'complete' ? 'disabled' : '' ?>>
                       <i class="fa-solid <?= $t['status'] === 'complete' ? 'fa-check-circle' : 'fa-circle' ?>"></i>
                     </button>
                   </div>
@@ -515,7 +582,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
       <?php endif; ?>
     </div>
 
-    <!-- NOTES TERBARU -->
     <div class="dashboard-card">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0 fw-bold text-brown">
@@ -585,7 +651,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     });
 
     const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
     document.getElementById('today-date').textContent = today.toLocaleDateString('id-ID', options);
 
     function updateClock() {
@@ -598,7 +669,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
     setInterval(updateClock, 1000);
     updateClock();
 
-    // === PERBAIKAN: Hanya pasang event pada tombol yang belum selesai ===
     document.querySelectorAll('.btn-complete').forEach(btn => {
       if (btn.disabled || btn.classList.contains('completed')) return;
 
@@ -610,44 +680,47 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
         const timeEl = card.querySelector('.waktu-selesai');
 
         fetch('', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'action=complete_todo&todo_id=' + todoId
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            this.innerHTML = '<i class="fa-solid fa-check-circle"></i>';
-            this.classList.add('completed');
-            this.disabled = true;
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=complete_todo&todo_id=' + todoId
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              this.innerHTML = '<i class="fa-solid fa-check-circle"></i>';
+              this.classList.add('completed');
+              this.disabled = true;
 
-            card.classList.remove('border-warning');
-            card.classList.add('border-success');
+              card.classList.remove('border-warning');
+              card.classList.add('border-success');
 
-            const now = new Date();
-            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+              const now = new Date();
+              const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
-            if (!timeEl) {
-              const div = document.createElement('div');
-              div.className = 'd-flex justify-content-between align-items-center';
-              div.innerHTML = `<small class="text-muted"><i class="fa-regular fa-clock"></i> ${card.querySelector('.text-muted').innerText.split(' ')[1]}</small>
+              if (!timeEl) {
+                const div = document.createElement('div');
+                div.className = 'd-flex justify-content-between align-items-center';
+                div.innerHTML = `<small class="text-muted"><i class="fa-regular fa-clock"></i> ${card.querySelector('.text-muted').innerText.split(' ')[1]}</small>
                                <small class="waktu-selesai"><i class="fa-solid fa-check"></i> ${time}</small>`;
-              card.querySelector('.card-body > div:last-child').replaceWith(div);
-            } else {
-              timeEl.innerHTML = `<i class="fa-solid fa-check"></i> ${time}`;
-            }
+                card.querySelector('.card-body > div:last-child').replaceWith(div);
+              } else {
+                timeEl.innerHTML = `<i class="fa-solid fa-check"></i> ${time}`;
+              }
 
-            const completed = parseInt(document.getElementById('completed-count').textContent) + 1;
-            document.getElementById('completed-count').textContent = completed;
-            const total = <?= $total_todo ?>;
-            const progress = (completed / total) * 100;
-            document.getElementById('progress-bar').style.width = progress + '%';
-            document.getElementById('progress-text').textContent = Math.round(progress) + '% tercapai';
-          }
-        });
+              const completed = parseInt(document.getElementById('completed-count').textContent) + 1;
+              document.getElementById('completed-count').textContent = completed;
+              const total = <?= $total_todo ?>;
+              const progress = (completed / total) * 100;
+              document.getElementById('progress-bar').style.width = progress + '%';
+              document.getElementById('progress-text').textContent = Math.round(progress) + '% tercapai';
+            }
+          });
       });
     });
   </script>
 
 </body>
+
 </html>
