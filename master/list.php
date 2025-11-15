@@ -1,24 +1,20 @@
 <?php
 session_start();
 include '../db.php';
-
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../index.php");
   exit;
 }
-$username  = $_SESSION['username'];
+$username = $_SESSION['username'];
 $role_name = $_SESSION['role_name'] ?? '';
-
 if (strtolower($role_name) !== 'admin') {
   echo "<script>alert('Akses ditolak! Hanya admin yang bisa mengakses halaman ini.'); window.location='../pages/dashboard.php';</script>";
   exit;
 }
 $message = '';
 $message_type = '';
-
 if (isset($_GET['delete_id'])) {
   $delete_id = (int)$_GET['delete_id'];
-
   if ($delete_id === $_SESSION['user_id']) {
     $message = "Anda tidak bisa menghapus akun sendiri!";
     $message_type = "danger";
@@ -35,21 +31,19 @@ if (isset($_GET['delete_id'])) {
     $stmt->close();
   }
 }
-
 $sql = "
-  SELECT 
-    users.id, 
-    users.username, 
-    users.email, 
-    roles.name AS role_name, 
-    users.created_at 
+  SELECT
+    users.id,
+    users.username,
+    users.email,
+    roles.name AS role_name,
+    users.created_at
   FROM users
   LEFT JOIN roles ON users.role_id = roles.id
   ORDER BY users.id DESC
 ";
 $result = $conn->query($sql);
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -59,7 +53,6 @@ $result = $conn->query($sql);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --primary: #8B5E3C;
@@ -68,21 +61,19 @@ $result = $conn->query($sql);
       --danger: #E57373;
       --dark: #613a1cff;
       --light: #fff7f5;
+      --logo: #f9b6a5;
     }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: 'Quicksand', sans-serif;
       background-color: var(--light);
       color: #333;
       overflow-x: hidden;
     }
-
     .sidebar {
       width: 250px;
       height: 100vh;
@@ -97,33 +88,28 @@ $result = $conn->query($sql);
       z-index: 1000;
       transition: all 0.3s ease;
     }
-
     .sidebar h4 {
       text-align: center;
       font-weight: 700;
       margin-bottom: 30px;
       font-size: 1.5rem;
-      color: #fff;
+      color: var(--logo) !important;
       animation: fadeSlideIn 1s ease forwards;
     }
-
+    .sidebar h4 i {
+      color: var(--logo) !important;
+      margin-right: 8px;
+      animation: bloom 1.6s ease-in-out forwards;
+    }
     @keyframes fadeSlideIn {
       0% { opacity: 0; transform: translateY(-15px) scale(0.9); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
-
-    .sidebar h4 i {
-      margin-right: 8px;
-      color: #f9b6a5;
-      animation: bloom 1.6s ease-in-out forwards;
-    }
-
     @keyframes bloom {
       0% { transform: scale(0) rotate(-45deg); opacity: 0; }
       60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
       100% { transform: scale(1) rotate(0); }
     }
-
     .sidebar .menu-link {
       display: flex;
       align-items: center;
@@ -135,19 +121,16 @@ $result = $conn->query($sql);
       border-left: 4px solid transparent;
       position: relative;
     }
-
     .sidebar .menu-link i {
       width: 25px;
       margin-right: 12px;
       font-size: 1.1rem;
     }
-
     .sidebar .menu-link:hover,
     .sidebar .menu-link.active {
       background-color: var(--secondary);
       border-left-color: #fff;
     }
-
     .sidebar .menu-link.has-submenu::after {
       content: '\f078';
       font-family: 'Font Awesome 6 Free';
@@ -157,11 +140,9 @@ $result = $conn->query($sql);
       font-size: 0.8rem;
       transition: transform 0.3s ease;
     }
-
     .sidebar .menu-link.active.has-submenu::after {
       transform: rotate(180deg);
     }
-
     .submenu {
       background-color: #fbe7e7;
       max-height: 0;
@@ -171,13 +152,11 @@ $result = $conn->query($sql);
       border-top: 1px solid #f3d1c8;
       border-bottom: 1px solid #f3d1c8;
     }
-
     .submenu.active {
       max-height: 300px;
       opacity: 1;
       padding: 8px 0;
     }
-
     .submenu a {
       display: block;
       color: var(--secondary);
@@ -186,25 +165,21 @@ $result = $conn->query($sql);
       text-decoration: none;
       transition: background 0.2s ease;
     }
-
     .submenu a i {
       margin-right: 8px;
       font-size: 0.8rem;
       color: #A46C4E;
     }
-
     .submenu a:hover {
       background-color: #f8d7d7;
       color: #7a4e2f;
     }
-
     .sidebar-footer {
       position: absolute;
       bottom: 20px;
       width: 100%;
       padding: 0 20px;
     }
-
     .logout-btn {
       display: block;
       background-color: #A46C4E;
@@ -217,16 +192,13 @@ $result = $conn->query($sql);
       font-weight: 600;
       transition: 0.3s;
     }
-
     .logout-btn:hover {
       background-color: rgba(255, 255, 255, 0.1);
       color: #fff;
     }
-
     .logout-btn i {
       margin-right: 10px;
     }
-
     .topbar {
       height: 65px;
       background-color: var(--dark);
@@ -242,59 +214,49 @@ $result = $conn->query($sql);
       z-index: 999;
       color: #fff;
     }
-
     .logo-section {
       display: flex;
       align-items: center;
       gap: 12px;
       animation: fadeInLogo 1.2s ease forwards;
     }
-
     @keyframes fadeInLogo {
       from { opacity: 0; transform: translateX(-15px); }
       to { opacity: 1; transform: translateX(0); }
     }
-
     .logo-icon {
       font-size: 1.6rem;
-      color: #f9b6a5;
+      color: var(--logo) !important;
       animation: bounceGrow 1.5s infinite alternate ease-in-out;
     }
-
     @keyframes bounceGrow {
       0% { transform: scale(1) translateY(0); }
       50% { transform: scale(1.1) translateY(-2px); }
       100% { transform: scale(1) translateY(0); }
     }
-
     .brand {
       font-weight: 700;
       font-size: 1.3rem;
-      color: #ffe5df;
+      color: var(--logo) !important;
     }
-
     .motto {
       font-size: 0.75rem;
-      color: #f9b6a5;
+      color: var(--logo);
       font-style: italic;
       opacity: 0.9;
       display: block;
       margin-top: -2px;
     }
-
-    /* USER SECTION: Hi, user + Avatar */
     .user-section {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
     .username {
       font-weight: 600;
       font-size: 1rem;
       white-space: nowrap;
     }
-
     .profile-icon {
       width: 42px;
       height: 42px;
@@ -307,20 +269,16 @@ $result = $conn->query($sql);
       box-shadow: 0 2px 5px rgba(0,0,0,0.15);
       transition: all 0.3s ease;
     }
-
     .profile-icon:hover {
       transform: scale(1.1);
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-
     .avatar-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: 50%;
     }
-
-    /* CONTENT */
     .content {
       margin-left: 250px;
       margin-top: 80px;
@@ -328,7 +286,6 @@ $result = $conn->query($sql);
       min-height: calc(100vh - 80px);
       background-color: var(--light);
     }
-
     .page-title {
       font-weight: 700;
       color: var(--primary);
@@ -337,7 +294,10 @@ $result = $conn->query($sql);
       align-items: center;
       gap: 10px;
     }
-
+    .page-title i {
+      color: var(--primary) !important;
+      font-size: 1.4rem;
+    }
     .btn-add {
       background-color: var(--secondary);
       color: #fff;
@@ -351,18 +311,15 @@ $result = $conn->query($sql);
       gap: 8px;
       transition: background 0.3s ease;
     }
-
     .btn-add:hover {
       background-color: #7a4e2f;
     }
-
     .table-container {
       background: #fff;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     }
-
     .table th {
       background-color: var(--primary);
       color: #fff;
@@ -370,12 +327,10 @@ $result = $conn->query($sql);
       text-align: center;
       vertical-align: middle;
     }
-
     .table td {
       vertical-align: middle;
       text-align: center;
     }
-
     .btn-edit, .btn-delete, .btn-detail {
       padding: 6px 10px;
       border: none;
@@ -383,20 +338,17 @@ $result = $conn->query($sql);
       font-size: 0.9rem;
       margin: 0 4px;
     }
-
     .btn-detail { background-color: #4CAF50; color: #fff; }
     .btn-detail:hover { background-color: #388E3C; }
     .btn-edit { background-color: var(--accent); color: #fff; }
     .btn-edit:hover { background-color: #E39E5D; }
     .btn-delete { background-color: var(--danger); color: #fff; }
     .btn-delete:hover { background-color: #C62828; }
-
     .badge {
       font-size: 0.8rem;
       padding: 6px 10px;
       border-radius: 20px;
     }
-
     .sidebar::-webkit-scrollbar {
       width: 6px;
     }
@@ -407,7 +359,7 @@ $result = $conn->query($sql);
     .sidebar::-webkit-scrollbar-track {
       background-color: #e7c9b3;
     }
-    
+   
     @media (max-width: 992px) {
       .sidebar {
         transform: translateX(-100%);
@@ -419,7 +371,6 @@ $result = $conn->query($sql);
         transform: translateX(0);
       }
     }
-
     @media (max-width: 576px) {
       .user-section {
         gap: 8px;
@@ -435,11 +386,12 @@ $result = $conn->query($sql);
         padding: 0 15px;
       }
     }
-    .sidebar i,
-    .topbar i,
+
+    /* PERBAIKAN UTAMA: Semua ikon putih, KECUALI logo */
+    .sidebar i:not(.sidebar h4 i):not(.logo-icon),
+    .topbar i:not(.logo-icon),
     .logout-btn i,
     .profile-icon i,
-    .page-title i,
     .btn-add i,
     .btn-detail i,
     .btn-edit i,
@@ -454,9 +406,6 @@ $result = $conn->query($sql);
       color: white !important;
     }
 
-    .logo-icon {
-      color: #f9b6a5 !important;
-    }
     #master-submenu a i {
       color: #A46C4E !important;
     }
@@ -465,11 +414,9 @@ $result = $conn->query($sql);
 <body>
   <div class="sidebar">
     <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
-
     <a href="../pages/dashboard.php" class="menu-link" data-target="dashboard">
       <i class="fa-solid fa-gauge-high"></i> Dashboard
     </a>
-
     <a href="../todo/personal.php" class="menu-link" data-target="todo">
       <i class="fa-solid fa-list-check"></i> To Do List
     </a>
@@ -478,7 +425,6 @@ $result = $conn->query($sql);
       <a href="../todo/work.php"><i class="fa-solid fa-briefcase"></i> Work</a>
       <a href="../todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
     </div>
-
     <a href="../notes/personal.php" class="menu-link" data-target="notes">
       <i class="fa-solid fa-note-sticky"></i> Notes
     </a>
@@ -487,7 +433,6 @@ $result = $conn->query($sql);
       <a href="../notes/work.php"><i class="fa-solid fa-file-lines"></i> Work</a>
       <a href="../notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
     </div>
-
     <?php if (strtolower($role_name) === 'admin'): ?>
       <a href="../master/list.php" class="menu-link active" data-target="master">
         <i class="fa-solid fa-gear"></i> Master
@@ -496,7 +441,6 @@ $result = $conn->query($sql);
         <a href="../master/list.php"><i class="fa-solid fa-users-gear"></i> User</a>
       </div>
     <?php endif; ?>
-
     <div class="sidebar-footer">
       <a href="../logout.php" class="logout-btn">
         <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -512,7 +456,6 @@ $result = $conn->query($sql);
         <div class="motto">Grow your day, one task at a time.</div>
       </div>
     </div>
-
     <div class="user-section">
       <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
       <a href="../pages/profile.php" class="profile-link">
@@ -521,7 +464,6 @@ $result = $conn->query($sql);
           $ava_file = $_SESSION['ava'] ?? 'default.png';
           $full_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $ava_file;
           $web_path = '/uploads/avatars/' . $ava_file;
-
           if (file_exists($full_path) && !empty($ava_file)) {
             echo '<img src="' . htmlspecialchars($web_path) . '" alt="Avatar" class="avatar-img">';
           } else {
@@ -535,8 +477,8 @@ $result = $conn->query($sql);
 
   <div class="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="page-title"><i class="fa-solid fa-user-gear"></i> Manage Accounts</h3>
-      <a href="add-user.php" class="btn-add"><i class="fa-solid fa-plus"></i> Tambah User</a>
+      <h3 class="page-title"><i class="fa-solid fa-users-gear"></i> Manage Accounts</h3>
+      <a href="tambah.php" class="btn-add"><i class="fa-solid fa-plus"></i> Tambah User</a>
     </div>
 
     <?php if ($message): ?>
@@ -604,27 +546,24 @@ $result = $conn->query($sql);
       </div>
     </div>
   </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const menuLinks = document.querySelectorAll('.menu-link.has-submenu');
-
       menuLinks.forEach(link => {
         link.addEventListener('click', function (e) {
           e.preventDefault();
           const target = this.dataset.target;
           const submenu = document.getElementById(target + '-submenu');
           const isActive = this.classList.contains('active');
-
           document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
           document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active'));
-
           if (!isActive && submenu) {
             this.classList.add('active');
             submenu.classList.add('active');
           }
         });
       });
-
       const currentFile = window.location.pathname.split('/').pop();
       const masterFiles = ['list.php', 'detail.php', 'edit.php', 'add-user.php'];
       if (masterFiles.includes(currentFile)) {
