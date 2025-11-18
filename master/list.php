@@ -417,6 +417,20 @@ if ($search !== '') {
       border-radius: 20px;
     }
 
+    .actions-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .search-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     @media (max-width: 992px) {
       .sidebar {
         transform: translateX(-100%);
@@ -444,6 +458,18 @@ if ($search !== '') {
 
       .topbar {
         padding: 0 15px;
+      }
+
+      .actions-container {
+        align-items: stretch;
+      }
+
+      .search-form {
+        width: 100%;
+      }
+
+      .search-form input {
+        flex: 1;
       }
     }
   </style>
@@ -517,20 +543,19 @@ if ($search !== '') {
   </div>
 
   <div class="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="page-title"><i class="fa-solid fa-users-gear"></i> Manage Accounts</h3>
-      <a href="tambah.php" class="btn-add"><i class="fa-solid fa-plus"></i> Tambah User</a>
-    </div>
+    <h3 class="page-title"><i class="fa-solid fa-users-gear"></i> Manage Accounts</h3>
 
-    <div class="mb-4">
-      <form method="GET" class="d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Cari username..." value="<?= htmlspecialchars($search) ?>" autofocus>
-        <button type="submit" class="btn me-2" style="background-color: var(--secondary); border: none; color: white;">
+    <div class="actions-container">
+      <a href="tambah.php" class="btn-add"><i class="fa-solid fa-plus"></i> Tambah User</a>
+      
+      <form method="GET" class="search-form">
+        <input type="text" name="search" class="form-control" placeholder="Cari username..." value="<?= htmlspecialchars($search) ?>" style="width: 300px;" autofocus>
+        <button type="submit" class="btn" style="background-color: var(--secondary); border: none; color: white;">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
         <?php if ($search !== ''): ?>
-          <a href="list.php" class="btn" style="background-color: #8B5E3C; border: none;">
-            <i class="fa-solid fa-times" style="color: white;"></i>
+          <a href="list.php" class="btn" style="background-color: #8B5E3C; border: none; color: white;">
+            <i class="fa-solid fa-times"></i>
           </a>
         <?php endif; ?>
       </form>
