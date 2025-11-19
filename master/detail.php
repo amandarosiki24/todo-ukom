@@ -91,9 +91,9 @@ $role_name = $_SESSION['role_name'] ?? '';
             position: fixed;
             top: 0;
             left: 0;
-            padding: 25px 0;
+            padding-top: 25px;
             overflow-y: auto;
-            box-shadow: 4px 0 15px rgba(0, 0, 0, .1);
+            box-shadow: 4px 0 10px rgba(0, 0, 0, .1);
             z-index: 1000;
             transition: .3s;
         }
@@ -101,7 +101,7 @@ $role_name = $_SESSION['role_name'] ?? '';
         .sidebar h4 {
             text-align: center;
             font-weight: 700;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-size: 1.5rem;
             animation: fadeSlideIn 1s forwards;
         }
@@ -140,42 +140,27 @@ $role_name = $_SESSION['role_name'] ?? '';
             }
         }
 
-        .sidebar .menu-link {
+        .sidebar a {
             display: flex;
             align-items: center;
             color: #fff;
-            padding: 12px 20px;
+            padding: 10px 20px;
             text-decoration: none;
             font-weight: 500;
             transition: .3s;
             border-left: 4px solid transparent;
-            position: relative;
         }
 
-        .sidebar .menu-link i {
+        .sidebar a i {
             width: 25px;
-            margin-right: 12px;
-            font-size: 1.1rem;
+            text-align: center;
+            margin-right: 10px;
         }
 
-        .sidebar .menu-link:hover,
-        .sidebar .menu-link.active {
+        .sidebar a:hover,
+        .sidebar a.active {
             background: var(--secondary);
             border-left-color: #fff;
-        }
-
-        .sidebar .menu-link.has-submenu::after {
-            content: '\f078';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            right: 20px;
-            font-size: .8rem;
-            transition: .3s;
-        }
-
-        .sidebar .menu-link.active.has-submenu::after {
-            transform: rotate(180deg);
         }
 
         .submenu {
@@ -183,29 +168,24 @@ $role_name = $_SESSION['role_name'] ?? '';
             max-height: 0;
             overflow: hidden;
             opacity: 0;
-            transition: max-height .4s, opacity .3s, padding .4s;
+            transition: max-height .4s, opacity .4s;
             border-top: 1px solid #f3d1c8;
             border-bottom: 1px solid #f3d1c8;
+            margin-left: 0;
         }
 
-        .submenu.active {
+        .submenu.active-menu {
             max-height: 300px;
             opacity: 1;
-            padding: 8px 0;
         }
 
         .submenu a {
             display: block;
             color: var(--secondary);
-            padding: 8px 20px 8px 57px;
-            font-size: .9rem;
+            padding: 8px 40px;
+            font-size: 14px;
             transition: .2s;
-        }
-
-        .submenu a i {
-            margin-right: 8px;
-            font-size: .8rem;
-            color: #da5e17;
+            border-left: none;
         }
 
         .submenu a:hover {
@@ -213,41 +193,50 @@ $role_name = $_SESSION['role_name'] ?? '';
             color: #7a4e2f;
         }
 
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--secondary);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background-color: #e7c9b3;
+        }
+
         .sidebar-footer {
             position: absolute;
-            bottom: 20px;
+            bottom: 0;
             width: 100%;
-            padding: 0 20px;
         }
 
         .logout-btn {
-            display: flex;
-            align-items: center;
-            color: #ffcccc;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-weight: 500;
+            display: block;
+            background: var(--secondary);
+            color: #fff;
             border-radius: 8px;
+            text-align: center;
+            margin: 25px 20px;
+            padding: 10px 0;
+            text-decoration: none;
+            font-weight: 600;
             transition: .3s;
         }
 
         .logout-btn:hover {
-            background: rgba(255, 255, 255, .1);
-            color: #fff;
-        }
-
-        .logout-btn i {
-            margin-right: 10px;
+            background: #7a4e2f;
         }
 
         .topbar {
             height: 65px;
             background: var(--dark);
-            border-bottom: 3px solid var(--primary);
+            border-bottom: 2px solid var(--primary);
             padding: 0 25px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             position: fixed;
             left: 250px;
             right: 0;
@@ -256,10 +245,11 @@ $role_name = $_SESSION['role_name'] ?? '';
             color: #fff;
         }
 
-        .logo-section {
+        .sprinklist-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            margin-right: auto;
             animation: fadeInLogo 1.2s forwards;
         }
 
@@ -276,7 +266,7 @@ $role_name = $_SESSION['role_name'] ?? '';
         }
 
         .logo-icon {
-            font-size: 1.6rem;
+            font-size: 28px;
             color: var(--pink);
             animation: bounceGrow 1.5s infinite alternate ease-in-out;
         }
@@ -295,30 +285,30 @@ $role_name = $_SESSION['role_name'] ?? '';
             }
         }
 
+        .tagline {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
         .brand {
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 18px;
+            letter-spacing: .5px;
             color: #ffe5df;
         }
 
         .motto {
-            font-size: .75rem;
+            font-size: 12px;
             color: var(--pink);
             font-style: italic;
             opacity: .9;
-            margin-top: -2px;
-        }
-
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
         }
 
         .username {
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 16px;
+            margin-right: 15px;
         }
 
         .profile-icon {
@@ -330,7 +320,7 @@ $role_name = $_SESSION['role_name'] ?? '';
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 18px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, .15);
             transition: .3s;
         }
@@ -338,6 +328,13 @@ $role_name = $_SESSION['role_name'] ?? '';
         .profile-icon:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 10px rgba(0, 0, 0, .2);
+        }
+
+        .profile-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .content {
@@ -368,6 +365,7 @@ $role_name = $_SESSION['role_name'] ?? '';
             align-items: center;
             gap: 8px;
             transition: .3s;
+            text-decoration: none;
         }
 
         .btn-back:hover {
@@ -456,16 +454,22 @@ $role_name = $_SESSION['role_name'] ?? '';
     <div class="sidebar">
         <h4><i class="fa-solid fa-seedling"></i> Sprinklist</h4>
 
-        <a href="../pages/dashboard.php" class="menu-link" data-target="dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="../pages/dashboard.php" class="menu-link" data-target="dashboard">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
 
-        <a href="../todo/personal.php" class="menu-link" data-target="todo"><i class="fa-solid fa-list-check"></i> To Do List</a>
+        <a href="javascript:void(0)" class="menu-link" data-target="todo">
+            <i class="fa-solid fa-list-check"></i> To Do List
+        </a>
         <div class="submenu" id="todo-submenu">
             <a href="../todo/personal.php"><i class="fa-solid fa-user"></i> Personal</a>
             <a href="../todo/work.php"><i class="fa-solid fa-briefcase"></i> Work</a>
             <a href="../todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
         </div>
 
-        <a href="../notes/personal.php" class="menu-link" data-target="notes"><i class="fa-solid fa-note-sticky"></i> Notes</a>
+        <a href="javascript:void(0)" class="menu-link" data-target="notes">
+            <i class="fa-solid fa-note-sticky"></i> Notes
+        </a>
         <div class="submenu" id="notes-submenu">
             <a href="../notes/personal.php"><i class="fa-solid fa-user-pen"></i> Personal</a>
             <a href="../notes/work.php"><i class="fa-solid fa-file-lines"></i> Work</a>
@@ -473,42 +477,45 @@ $role_name = $_SESSION['role_name'] ?? '';
         </div>
 
         <?php if (strtolower($role_name) === 'admin'): ?>
-            <a href="list.php" class="menu-link active" data-target="master"><i class="fa-solid fa-gear"></i> Master</a>
-            <div class="submenu active" id="master-submenu">
+            <a href="javascript:void(0)" class="menu-link active" data-target="master">
+                <i class="fa-solid fa-gear"></i> Master
+            </a>
+            <div class="submenu active-menu" id="master-submenu">
                 <a href="list.php"><i class="fa-solid fa-users-gear"></i> User</a>
             </div>
         <?php endif; ?>
 
         <div class="sidebar-footer">
-            <a href="../logout.php" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-        </div>
-    </div>
-    <div class="topbar">
-        <div class="logo-section">
-            <i class="fa-solid fa-seedling logo-icon"></i>
-            <div>
-                <div class="brand">Sprinklist</div>
-                <div class="motto">Grow your day, one task at a time.</div>
-            </div>
-        </div>
-        <div class="user-section">
-            <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
-            <a href="../pages/profile.php" class="profile-link">
-                <div class="profile-icon">
-                    <?php
-                    $ava_file = $_SESSION['ava'] ?? 'default.png';
-                    $full_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $ava_file;
-                    $web_path = '/uploads/avatars/' . $ava_file;
-
-                    if (file_exists($full_path) && !empty($ava_file)) {
-                        echo '<img src="' . htmlspecialchars($web_path) . '" alt="Avatar" class="avatar-img">';
-                    } else {
-                        echo '<i class="fa-solid fa-user"></i>';
-                    }
-                    ?>
-                </div>
+            <a href="../logout.php" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
             </a>
         </div>
+    </div>
+
+    <div class="topbar">
+        <div class="sprinklist-logo">
+            <i class="fa-solid fa-seedling logo-icon"></i>
+            <div class="tagline">
+                <span class="brand">Sprinklist</span>
+                <span class="motto">Grow your day, one task at a time.</span>
+            </div>
+        </div>
+        <span class="username">Hi, <?= htmlspecialchars($username); ?></span>
+        <a href="../pages/profile.php" class="profile-link">
+            <div class="profile-icon">
+                <?php
+                $ava_file = $_SESSION['ava'] ?? 'default.png';
+                $full_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $ava_file;
+                $web_path = '/uploads/avatars/' . $ava_file;
+
+                if (file_exists($full_path) && !empty($ava_file)) {
+                    echo '<img src="' . htmlspecialchars($web_path) . '" alt="Avatar" class="avatar-img">';
+                } else {
+                    echo '<i class="fa-solid fa-user"></i>';
+                }
+                ?>
+            </div>
+        </a>
     </div>
 
     <div class="content">
@@ -551,34 +558,22 @@ $role_name = $_SESSION['role_name'] ?? '';
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const menuLinks = document.querySelectorAll('.menu-link');
 
-            document.querySelectorAll('.menu-link.has-submenu').forEach(link => {
-                link.addEventListener('click', e => {
-                    e.preventDefault();
-                    const target = link.dataset.target;
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    const target = this.dataset.target;
                     const submenu = document.getElementById(target + '-submenu');
-                    const active = link.classList.contains('active');
 
-                    document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
-                    document.querySelectorAll('.submenu').forEach(s => s.classList.remove('active'));
-
-                    if (!active && submenu) {
-                        link.classList.add('active');
-                        submenu.classList.add('active');
+                    if (submenu) {
+                        e.preventDefault();
+                        menuLinks.forEach(l => l.classList.remove('active'));
+                        document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active-menu'));
+                        this.classList.add('active');
+                        submenu.classList.add('active-menu');
                     }
                 });
             });
-
-            const currentFile = location.pathname.split('/').pop();
-            const masterFiles = ['list.php', 'detail.php', 'edit.php', 'add-user.php'];
-            if (masterFiles.includes(currentFile)) {
-                const m = document.querySelector('[data-target="master"]');
-                const s = document.getElementById('master-submenu');
-                if (m && s) {
-                    m.classList.add('active');
-                    s.classList.add('active');
-                }
-            }
         });
     </script>
 

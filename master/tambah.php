@@ -373,14 +373,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  max-width: 500px;
+  margin: 0 auto;
+  margin-top: -25px;
+}
     .form-label {
       font-weight: 600;
       color: var(--primary);
@@ -531,7 +531,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       margin-top: auto;
       padding: 20px 20px 30px;
     }
+.form-header {
+  background-color: var(--primary);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px 10px 0 0;
+  margin: -30px -30px 25px -30px;
+  text-align: center;
+}
 
+.form-header h4 {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 0;
+  color: white !important;
+}
+
+.form-header i {
+  color: white !important;
+}
     /* Styling untuk button group */
     .button-group {
       display: grid;
@@ -608,9 +629,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </a>
   </div>
 
-  <div class="content">
-    <h3 class="page-title"><i class="fa-solid fa-user-plus"></i> Tambah User Baru</h3>
-
+<div class="content">
     <?php if ($message): ?>
       <div class="alert alert-<?= $message_type ?> alert-dismissible fade show" role="alert">
         <?= htmlspecialchars($message) ?>
@@ -619,6 +638,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <div class="card">
+      <!-- TAMBAHKAN JUDUL FORM DI SINI -->
+      <div class="form-header" style="background-color: var(--dark); color: white; padding: 15px 20px; border-radius: 10px 10px 0 0; margin: -30px -30px 25px -30px;">
+        <h4 class="mb-0" style="font-weight: 700; display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-user-plus"></i> Form Tambah User
+        </h4>
+      </div>
+
       <form method="POST" enctype="multipart/form-data">
         <div class="avatar-upload">
           <label for="avatar" class="avatar-preview" id="avatarBox">
@@ -668,7 +694,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </form>
     </div>
   </div>
-
   <script>
     function previewImage(event) {
       const reader = new FileReader();
