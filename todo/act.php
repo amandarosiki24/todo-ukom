@@ -10,6 +10,16 @@ if (!isset($_SESSION['user_id'])) {
 $username  = $_SESSION['username'];
 $role_name = $_SESSION['role_name'];
 $base_url = '/todo-27rplb-b11-ukom';
+
+if (isset($_GET['delete'])) {
+    $delete_id = intval($_GET['delete']);
+    $user_id = $_SESSION['user_id'];
+
+    $conn->query("DELETE FROM todos WHERE id = $delete_id AND user_id = $user_id");
+
+    header("Location: act.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +28,7 @@ $base_url = '/todo-27rplb-b11-ukom';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sprinklist-Todo-Activity</title>
+  <title>Activity To Do - Sprinklist</title>
 
   <base href="<?= $base_url ?>/">
 
@@ -234,6 +244,17 @@ $base_url = '/todo-27rplb-b11-ukom';
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     }
 
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .profile-link {
+      text-decoration: none;
+    }
+
     .content {
       margin-left: 250px;
       margin-top: 80px;
@@ -276,6 +297,165 @@ $base_url = '/todo-27rplb-b11-ukom';
     .sidebar::-webkit-scrollbar-track {
       background-color: #e7c9b3;
     }
+
+    /* Todo Styles - Updated to match Notes */
+    .todo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .todo-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #8B5E3C;
+    }
+
+    .todo-title i {
+      color: #A46C4E;
+    }
+
+    .btn-add-todo {
+      background-color: #8B5E3C;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-add-todo:hover {
+      background-color: #A46C4E;
+      color: white;
+    }
+
+    .todo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .todo-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border-left: 4px solid;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    .todo-card:nth-child(4n+1) {
+      border-left-color: #4A90E2;
+    }
+
+    .todo-card:nth-child(4n+2) {
+      border-left-color: #E2A74A;
+    }
+
+    .todo-card:nth-child(4n+3) {
+      border-left-color: #50C878;
+    }
+
+    .todo-card:nth-child(4n+4) {
+      border-left-color: #E24A4A;
+    }
+
+    .todo-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .todo-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .todo-content {
+      font-size: 14px;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .todo-date {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .todo-actions {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-todo-action {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .btn-edit {
+      background-color: #f0f0f0;
+      color: #666;
+    }
+
+    .btn-edit:hover {
+      background-color: #4A90E2;
+      color: white;
+    }
+
+    .btn-delete {
+      background-color: #f0f0f0;
+      color: #666;
+    }
+
+    .btn-delete:hover {
+      background-color: #E24A4A;
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state i {
+      font-size: 64px;
+      margin-bottom: 20px;
+      color: #ddd;
+    }
   </style>
 </head>
 
@@ -287,13 +467,13 @@ $base_url = '/todo-27rplb-b11-ukom';
       <i class="fa-solid fa-gauge-high"></i> Dashboard
     </a>
 
-    <a href="javascript:void(0)" class="menu-link" data-target="todo">
+    <a href="javascript:void(0)" class="menu-link active" data-target="todo">
       <i class="fa-solid fa-list-check"></i> To Do List
     </a>
-    <div class="submenu" id="todo-submenu">
+    <div class="submenu active-menu" id="todo-submenu">
       <a href="todo/personal.php"><i class="fa-solid fa-user"></i> Personal</a>
       <a href="todo/work.php"><i class="fa-solid fa-briefcase"></i> Work</a>
-      <a href="todo/act.php"><i class="fa-solid fa-calendar-check"></i> Activities</a>
+      <a href="todo/act.php" style="background-color: #f8d7d7; color: #7a4e2f;"><i class="fa-solid fa-calendar-check"></i> Activities</a>
     </div>
 
     <a href="javascript:void(0)" class="menu-link" data-target="notes">
@@ -348,31 +528,66 @@ $base_url = '/todo-27rplb-b11-ukom';
   </div>
 
   <div class="content">
-    <!-- Isi halaman kamu di sini -->
+    <div class="todo-header">
+      <div class="todo-title">
+        <i class="fa-solid fa-calendar-check"></i>
+        Activity To Do List
+      </div>
+      <a href="todo/tambah.php" class="btn-add-todo">
+        <i class="fa-solid fa-plus"></i> Tambah
+      </a>
+    </div>
+
+    <?php
+    $user_id = $_SESSION['user_id'];
+    $category_id = 3;
+
+    $sql = "
+      SELECT * FROM todos
+      WHERE user_id = $user_id
+      AND category_id = $category_id
+      ORDER BY created_at DESC
+    ";
+    $result = $conn->query($sql);
+    ?>
+
+    <?php if ($result->num_rows > 0): ?>
+      <div class="todo-grid">
+        <?php while ($row = $result->fetch_assoc()): ?>
+          <div class="todo-card">
+            <div class="todo-actions">
+              <a href="todo/edit.php?id=<?= $row['id']; ?>" class="btn-todo-action btn-edit">
+                <i class="fa-solid fa-pen"></i>
+              </a>
+              <button class="btn-todo-action btn-delete" onclick="confirmDelete(<?= $row['id'] ?>)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+            
+            <div class="todo-card-title"><?= htmlspecialchars($row['title']); ?></div>
+            <div class="todo-content">
+              <?= empty($row['description']) ? 'Tanpa deskripsi' : nl2br(htmlspecialchars($row['description'])); ?>
+            </div>
+            <div class="todo-date">
+              <i class="fa-regular fa-calendar"></i>
+              <?= date('d M H:i', strtotime($row['created_at'])) ?>
+            </div>
+          </div>
+        <?php endwhile; ?>
+      </div>
+    <?php else: ?>
+      <div class="empty-state">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h4>Belum ada to-do</h4>
+        <p>Klik tombol "Tambah" untuk membuat to-do pertama Anda</p>
+      </div>
+    <?php endif; ?>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const currentPath = window.location.pathname;
       const menuLinks = document.querySelectorAll('.menu-link');
-      let activeTarget = null;
-
-      if (currentPath.includes('pages/dashboard.php')) {
-        activeTarget = 'dashboard';
-      } else if (currentPath.includes('/todo/')) {
-        activeTarget = 'todo';
-      } else if (currentPath.includes('/notes/')) {
-        activeTarget = 'notes';
-      } else if (currentPath.includes('master/list.php')) {
-        activeTarget = 'master';
-      }
-
-      menuLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.dataset.target === activeTarget) {
-          link.classList.add('active');
-        }
-      });
 
       menuLinks.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -389,8 +604,13 @@ $base_url = '/todo-27rplb-b11-ukom';
         });
       });
     });
+
+    function confirmDelete(id) {
+      if (confirm('Apakah Anda yakin ingin menghapus to-do ini?')) {
+        window.location.href = 'todo/act.php?delete=' + id;
+      }
+    }
   </script>
 
 </body>
-
 </html>
