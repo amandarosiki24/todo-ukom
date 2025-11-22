@@ -2,14 +2,10 @@
 session_start();
 include '../db.php';
 
-// ==========================
-//   PROSES SIMPAN TODOS
-// ==========================
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $judul      = $_POST['judul'];
-    $tanggal    = $_POST['tanggal'];
+    $tanggal    = date('Y-m-d'); 
     $kategori   = $_POST['kategori'];
     $deskripsi  = $_POST['deskripsi'];
     $userid     = $_SESSION['user_id'];
@@ -56,6 +52,7 @@ if (!isset($_SESSION['user_id'])) {
 $username  = $_SESSION['username'];
 $role_name = $_SESSION['role_name'];
 $base_url = '/todo-27rplb-b11-ukom'; 
+$tanggal_hari_ini = date('Y-m-d');
 ?>
 
 <!DOCTYPE html>
@@ -298,7 +295,6 @@ $base_url = '/todo-27rplb-b11-ukom';
       background-color: #e7c9b3;
     }
 
-    /* Form Styles - Match Notes Add */
     .card-tambah {
       max-width: 560px;
       margin: 0 auto;
@@ -333,6 +329,12 @@ $base_url = '/todo-27rplb-b11-ukom';
     .form-control:focus, .form-select:focus {
       border-color: #7a4e2f;
       box-shadow: 0 0 0 0.2rem rgba(122,78,47,0.25);
+    }
+
+    .form-control:disabled {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+      opacity: 0.7;
     }
 
     textarea.form-control {
@@ -388,6 +390,15 @@ $base_url = '/todo-27rplb-b11-ukom';
 
     .required {
       color: #E24A4A;
+    }
+
+    .date-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #666;
+      font-size: 14px;
+      margin-top: 6px;
     }
   </style>
 </head>
@@ -472,8 +483,12 @@ $base_url = '/todo-27rplb-b11-ukom';
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Tanggal <span class="required">*</span></label>
-          <input type="date" name="tanggal" class="form-control" required>
+          <label class="form-label">Tanggal</label>
+          <input type="date" name="tanggal" class="form-control" value="<?= $tanggal_hari_ini ?>" disabled>
+          <div class="date-info">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Tanggal otomatis menggunakan hari ini</span>
+          </div>
         </div>
 
         <div class="mb-3">
@@ -507,7 +522,7 @@ $base_url = '/todo-27rplb-b11-ukom';
             <i class="fa-solid fa-arrow-left"></i>Kembali
           </a>
           <button type="submit" class="btn-simpan">
-            <i class="fa-solid fa-save"></i>Simpan
+            <i class="fa-solid fa-save"></i> Simpan
           </button>
         </div>
 
@@ -516,7 +531,6 @@ $base_url = '/todo-27rplb-b11-ukom';
   </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -538,20 +552,17 @@ $base_url = '/todo-27rplb-b11-ukom';
       });
     });
 
-    // === LOGIKA KATEGORI DINAMIS ===
     const kategoriItems = document.querySelectorAll('.kategori-item');
     const selectedKategori = document.getElementById('selectedKategori');
     const kategoriInput = document.getElementById('kategoriInput');
     const btnKembali = document.getElementById('btnKembali');
 
-    // Dropdown kategori
     kategoriItems.forEach(item => {
       item.addEventListener('click', function(e) {
         e.preventDefault();
         selectedKategori.textContent = this.textContent;
         kategoriInput.value = this.getAttribute('data-value');
         
-        // Update tombol Kembali berdasarkan kategori
         const kat = this.getAttribute('data-value');
         if (kat === 'personal') btnKembali.href = 'todo/personal.php';
         else if (kat === 'work') btnKembali.href = 'todo/work.php';

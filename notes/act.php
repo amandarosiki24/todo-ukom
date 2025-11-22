@@ -377,12 +377,68 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
       margin-bottom: 8px;
     }
 
+    .note-image-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
     .note-image {
       width: 100%;
-      height: 180px;
+      height: 100%;
       object-fit: cover;
-      border-radius: 8px 8px 0 0;
-      margin-bottom: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .note-image-container:hover .note-image {
+      transform: scale(1.1);
+    }
+
+    .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .image-overlay i {
+      color: white;
+      font-size: 32px;
+    }
+
+    .note-image-container:hover .image-overlay {
+      opacity: 1;
+    }
+
+    .note-image-placeholder {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      gap: 10px;
+    }
+
+    .note-image-placeholder i {
+      font-size: 48px;
+      opacity: 0.5;
+    }
+
+    .note-image-placeholder span {
+      font-size: 14px;
+      font-style: italic;
     }
 
     .note-body {
@@ -412,6 +468,27 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
       gap: 6px;
       font-size: 13px;
       color: #999;
+    }
+
+    .note-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .note-has-image {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #4A90E2;
+      font-size: 14px;
+    }
+
+    .note-has-image i {
+      font-size: 16px;
     }
 
     .note-actions {
@@ -469,6 +546,69 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
       font-size: 64px;
       margin-bottom: 20px;
       color: #ddd;
+    }
+
+    /* Modal untuk preview gambar */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .image-modal-content {
+      position: relative;
+      margin: auto;
+      display: block;
+      max-width: 90%;
+      max-height: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: zoomIn 0.3s ease;
+    }
+
+    @keyframes zoomIn {
+      from { transform: translateY(-50%) scale(0.5); }
+      to { transform: translateY(-50%) scale(1); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      z-index: 10000;
+    }
+
+    .modal-close:hover {
+      color: #bbb;
+    }
+
+    .modal-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ccc;
+      text-align: center;
+      padding: 10px 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 5px;
+      max-width: 80%;
     }
   </style>
 </head>
@@ -557,26 +697,48 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
       <?php foreach ($notes as $note): ?>
         <div class="note-card">
           <div class="note-actions">
-            <a href="notes/edit.php?id=<?= $note['id']; ?>" class="btn-note-action btn-edit">
+            <a href="notes/edit.php?id=<?= $note['id']; ?>" class="btn-note-action btn-edit" title="Edit Note">
               <i class="fa-solid fa-pen"></i>
             </a>
-            <button class="btn-note-action btn-delete" onclick="confirmDelete(<?= $note['id'] ?>)">
+            <button class="btn-note-action btn-delete" onclick="confirmDelete(<?= $note['id'] ?>)" title="Hapus Note">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
           
           <?php if (!empty($note['foto'])): ?>
-            <img src="uploads/notes/<?= htmlspecialchars($note['foto']) ?>" alt="Note Image" class="note-image">
+            <?php 
+              // Coba beberapa kemungkinan path
+              $foto_filename = htmlspecialchars($note['foto']);
+              $foto_path = $base_url . '/uploads/notes/' . $foto_filename;
+              $full_foto_path = $_SERVER['DOCUMENT_ROOT'] . $base_url . '/uploads/notes/' . $foto_filename;
+              
+              // Debug: uncomment baris ini untuk melihat path
+              // echo "<!-- Path: " . $foto_path . " | Full: " . $full_foto_path . " | Exists: " . (file_exists($full_foto_path) ? 'YES' : 'NO') . " -->";
+            ?>
+            
+            <div class="note-image-container" onclick="openImageModal('<?= $foto_path ?>', '<?= htmlspecialchars(addslashes($note['title'])) ?>')">
+              <img src="<?= $foto_path ?>" alt="<?= htmlspecialchars($note['title']) ?>" class="note-image" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'note-image-placeholder\'><i class=\'fa-solid fa-image\'></i><span>Gambar tidak dapat dimuat</span></div>'">
+              <div class="image-overlay">
+                <i class="fa-solid fa-search-plus"></i>
+              </div>
+            </div>
           <?php endif; ?>
           
           <div class="<?= !empty($note['foto']) ? 'note-body' : 'note-body-no-image' ?>">
             <div class="note-title"><?= htmlspecialchars($note['title']) ?></div>
             <div class="note-content">
-              <?= empty($note['description']) ? 'Tanpa isi' : nl2br(htmlspecialchars($note['description'])) ?>
+              <?= empty($note['description']) ? '<span class="text-muted">Tanpa isi</span>' : nl2br(htmlspecialchars($note['description'])) ?>
             </div>
-            <div class="note-date">
-              <i class="fa-regular fa-calendar"></i>
-              <?= date('d M H:i', strtotime($note['created_at'])) ?>
+            <div class="note-footer">
+              <div class="note-date">
+                <i class="fa-regular fa-calendar"></i>
+                <?= date('d M Y, H:i', strtotime($note['created_at'])) ?>
+              </div>
+              <?php if (!empty($note['foto'])): ?>
+                <div class="note-has-image">
+                  <i class="fa-solid fa-camera"></i>
+                </div>
+              <?php endif; ?>
             </div>
           </div>
         </div>
@@ -589,6 +751,13 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
       <p>Klik tombol "Tambah" untuk membuat note pertama Anda</p>
     </div>
   <?php endif; ?>
+</div>
+
+<!-- Modal untuk preview gambar -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+  <span class="modal-close" onclick="closeImageModal()">&times;</span>
+  <img class="image-modal-content" id="modalImage">
+  <div class="modal-caption" id="modalCaption"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -617,6 +786,28 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
       window.location.href = 'notes/act.php?delete=' + id;
     }
   }
+
+  // Preview gambar dalam modal
+  function openImageModal(imageSrc, imageTitle) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    
+    modal.style.display = 'block';
+    modalImg.src = imageSrc;
+    modalCaption.textContent = imageTitle;
+  }
+
+  function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+  }
+
+  // Close modal dengan ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeImageModal();
+    }
+  });
 </script>
 
 </body>

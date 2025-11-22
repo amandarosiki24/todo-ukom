@@ -9,18 +9,46 @@ if (!isset($_SESSION['user_id'])) {
 
 $username  = $_SESSION['username'];
 $role_name = $_SESSION['role_name'];
+$user_id = $_SESSION['user_id'];
 $base_url = '/todo-27rplb-b11-ukom';
 
 // Handle Delete Note
 if (isset($_GET['delete'])) {
   $delete_id = intval($_GET['delete']);
-  $user_id = $_SESSION['user_id'];
-
-  $conn->query("DELETE FROM notes WHERE id = $delete_id AND user_id = $user_id AND type = 'personal'");
+  
+  // Get foto filename before delete
+  $stmt = $conn->prepare("SELECT foto FROM notes WHERE id = ? AND user_id = ? AND category_id = 1");
+  $stmt->bind_param("ii", $delete_id, $user_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  
+  if ($result->num_rows > 0) {
+    $note = $result->fetch_assoc();
+    
+    // Delete from database
+    $stmt = $conn->prepare("DELETE FROM notes WHERE id = ? AND user_id = ? AND category_id = 1");
+    $stmt->bind_param("ii", $delete_id, $user_id);
+    $stmt->execute();
+    
+    // Delete foto file if exists
+    if (!empty($note['foto'])) {
+      $foto_path = $_SERVER['DOCUMENT_ROOT'] . $base_url . '/uploads/notes/' . $note['foto'];
+      if (file_exists($foto_path)) {
+        unlink($foto_path);
+      }
+    }
+  }
 
   header("Location: personal.php");
   exit;
 }
+
+// Fetch Notes with category_id = 1 (Personal)
+$stmt = $conn->prepare("SELECT * FROM notes WHERE user_id = ? AND category_id = 1 ORDER BY created_at DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$notes = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -412,7 +440,7 @@ if (isset($_GET['delete'])) {
     }
 
     .btn-edit {
-      background-color: #f0f0f0;
+      background-color: rgba(240, 240, 240, 0.9);
       color: #666;
     }
 
@@ -422,7 +450,7 @@ if (isset($_GET['delete'])) {
     }
 
     .btn-delete {
-      background-color: #f0f0f0;
+      background-color: rgba(240, 240, 240, 0.9);
       color: #666;
     }
 
@@ -519,52 +547,44 @@ if (isset($_GET['delete'])) {
       <i class="fa-solid fa-note-sticky"></i>
       Notes Personal
     </div>
-    <a href="notes/tambah.php" class="btn-add-note">
+    <a href="notes/tambah.php?category=3" class="btn-add-note">
       <i class="fa-solid fa-plus"></i> Tambah
     </a>
   </div>
 
-  <?php
-  $user_id = $_SESSION['user_id'];
-
-  $sql = "
-    SELECT * FROM notes
-    WHERE user_id = $user_id
-    AND type = 'personal'
-    ORDER BY created_at DESC
-  ";
-  $result = $conn->query($sql);
-  ?>
-
-  <?php if ($result->num_rows > 0): ?>
+  <?php if (count($notes) > 0): ?>
     <div class="notes-grid">
-      <?php while ($row = $result->fetch_assoc()): ?>
+      <?php foreach ($notes as $note): ?>
         <div class="note-card">
           <div class="note-actions">
-            <a href="notes/edit.php?id=<?= $row['id']; ?>" class="btn-note-action btn-edit">
+            <a href="notes/edit.php?id=<?= $note['id']; ?>" class="btn-note-action btn-edit">
               <i class="fa-solid fa-pen"></i>
             </a>
-            <button class="btn-note-action btn-delete" onclick="confirmDelete(<?= $row['id'] ?>)">
+            <button class="btn-note-action btn-delete" onclick="confirmDelete(<?= $note['id'] ?>)">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
           
-          <?php if (!empty($row['foto'])): ?>
-            <img src="uploads/notes/<?= htmlspecialchars($row['foto']) ?>" alt="Note Image" class="note-image">
-          <?php endif; ?>
+          <?php if (!empty($note['foto'])): ?>
+  <?php 
+    $foto_path = $base_url . '/uploads/notes/' . htmlspecialchars($note['foto']);
+    $full_foto_path = $_SERVER['DOCUMENT_ROOT'] . $base_url . '/uploads/notes/' . $note['foto'];
+  ?>
+  <img src="<?= $foto_path ?>" alt="<?= htmlspecialchars($note['title']) ?>" class="note-image">
+<?php endif; ?>
           
-          <div class="<?= !empty($row['foto']) ? 'note-body' : 'note-body-no-image' ?>">
-            <div class="note-title"><?= htmlspecialchars($row['title']) ?></div>
+          <div class="<?= !empty($note['foto']) ? 'note-body' : 'note-body-no-image' ?>">
+            <div class="note-title"><?= htmlspecialchars($note['title']) ?></div>
             <div class="note-content">
-              <?= empty($row['description']) ? 'Tanpa isi' : nl2br(htmlspecialchars($row['description'])) ?>
+              <?= empty($note['description']) ? 'Tanpa isi' : nl2br(htmlspecialchars($note['description'])) ?>
             </div>
             <div class="note-date">
               <i class="fa-regular fa-calendar"></i>
-              <?= date('d M H:i', strtotime($row['created_at'])) ?>
+              <?= date('d M H:i', strtotime($note['created_at'])) ?>
             </div>
           </div>
         </div>
-      <?php endwhile; ?>
+      <?php endforeach; ?>
     </div>
   <?php else: ?>
     <div class="empty-state">

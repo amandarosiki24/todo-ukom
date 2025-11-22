@@ -27,7 +27,7 @@ if (!$user) {
     exit;
 }
 
-// Fungsi inisial dari username
+//fungsi untuk inisial pada profile
 function getInitials($name)
 {
     $parts = explode(' ', trim($name));
@@ -42,7 +42,7 @@ $avatarPath = $hasAvatar
     ? "../uploads/avatars/{$user['ava']}"
     : "../assets/img/default-avatar.png";
 
-// Ambil data session untuk topbar
+// mengambil data pengguna untuk topbar
 $username = $_SESSION['username'];
 $role_name = $_SESSION['role_name'] ?? '';
 ?>
@@ -526,7 +526,7 @@ $role_name = $_SESSION['role_name'] ?? '';
 
         <div class="card">
             <div class="row g-4 align-items-center">
-                <!-- Avatar -->
+                <!-- ava -->
                 <div class="col-md-4 text-center">
                     <div class="avatar-container">
                         <?php if ($hasAvatar): ?>

@@ -13,12 +13,11 @@ $user_id   = $_SESSION['user_id'];
 
 //complete todo
 if (isset($_POST['action']) && $_POST['action'] === 'complete_todo') {
-  $todo_id = (int)$_POST['todo_id']; //ambil id  pada todo, gunakan integer 
-  //menyiapkan instruksi untuk melakukan upadate status menjadi  complete, dan isi waktu selesai menggunakan id user yang sedang login 
+  $todo_id = (int)$_POST['todo_id'];
   $stmt = $conn->prepare("UPDATE todos SET status = 'Complete', selesai_at = NOW() WHERE id = ? AND user_id = ?");
-  $stmt->bind_param("ii", $todo_id, $user_id); //massukan data todo id  user id ke dalam db
-  $success = $stmt->execute(); //jalankan perintah sql dengan hasil : gagal/berhasil 
-  echo json_encode(['success' => $success]); //menampilkan jawaban dalam bentuk json berhasi/tidak 
+  $stmt->bind_param("ii", $todo_id, $user_id);
+  $success = $stmt->execute();
+  echo json_encode(['success' => $success]);
   exit;
 }
 
@@ -507,6 +506,44 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
     .removing {
       animation: slideOut 0.3s ease forwards;
     }
+
+    .note-card-clickable {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .note-card-clickable:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 28px rgba(139, 94, 60, 0.2) !important;
+    }
+
+    /* Style untuk foto notes */
+    .note-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .note-card-clickable:hover .note-image {
+      transform: scale(1.05);
+    }
+
+    .note-image-placeholder {
+      width: 100%;
+      height: 150px;
+      background: linear-gradient(135deg, #f3d1c8 0%, #fbe7e7 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      color: #A46C4E;
+      font-size: 2.5rem;
+      opacity: 0.3;
+    }
   </style>
 </head>
 
@@ -537,7 +574,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
       <a href="../notes/act.php"><i class="fa-solid fa-calendar-days"></i> Activities</a>
     </div>
 
-    <?php  //hanya tampilkan menu master kepada user dengan role Admin 
+    <?php
     if (strtolower($role_name) === 'admin'): ?>
       <a href="#" class="menu-link" data-target="master">
         <i class="fa-solid fa-gear"></i> Master
@@ -598,7 +635,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
       </div>
 
       <?php
-      // ambil data semua todo user yang login, dan join ambil data tabel kategori
       $todo_query = "SELECT t.*, 
                      c.name as category_name, 
                      IFNULL(DATE_FORMAT(t.selesai_at, '%H:%i'), NULL) as waktu_selesai 
@@ -606,19 +642,18 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
                      LEFT JOIN categories c ON t.category_id = c.id
                      WHERE t.user_id = ? AND DATE(t.created_at) = CURDATE() 
                      ORDER BY t.created_at DESC";
-      $stmt = $conn->prepare($todo_query); //siapkan data todo 
+      $stmt = $conn->prepare($todo_query);
       $stmt->bind_param("i", $user_id);
-      $stmt->execute(); //jalankan query 
-      $todo_result = $stmt->get_result(); //mengambil data dari hasil query 
-      $total_todo = $todo_result->num_rows; //hitung jumlah todo  
-      $completed_todo = 0; //simpan todo saat sudah di selesaikan, dan di mulai dari 0
-      $todos = []; //menyiapkan array untuk simpan data todo 
+      $stmt->execute();
+      $todo_result = $stmt->get_result();
+      $total_todo = $todo_result->num_rows;
+      $completed_todo = 0;
+      $todos = [];
       while ($row = $todo_result->fetch_assoc()) {
-        if (strtolower($row['status']) === 'complete') $completed_todo++; //jika todos di selesaikan statusnya di simpan di complete, berupa 
-        $todos[] = $row; //simpan data todo dalam bentuk array 
+        if (strtolower($row['status']) === 'complete') $completed_todo++;
+        $todos[] = $row;
       }
-      //menghitung presentase complete nya, todo completed : jumlah todo di x 100
-      $progress_todo = $total_todo > 0 ? ($completed_todo / $total_todo) * 100 : 0; //jika tidak ada todo maka presentasenya 0
+      $progress_todo = $total_todo > 0 ? ($completed_todo / $total_todo) * 100 : 0;
       ?>
 
       <div class="progress-container mb-4">
@@ -635,11 +670,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
         <small class="text-muted d-block mt-1 text-end" id="progress-text"><?= round($progress_todo) ?>% tercapai</small>
       </div>
 
-      <?php  //jika ada todo, tampilkan data todo, 0 apabila tidak ada todo 
-      if ($total_todo > 0): ?>
+      <?php if ($total_todo > 0): ?>
         <div class="row g-3" id="todo-container">
-          <?php foreach ($todos as $i => $t): //loop data todo, id, isi todo 
-            //menentukan halaman redirect 
+          <?php foreach ($todos as $i => $t):
             $redirect_page = '../todo/personal.php';
             if ($t['category_id'] == 2) {
               $redirect_page = '../todo/work.php';
@@ -647,7 +680,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
               $redirect_page = '../todo/act.php';
             }
             
-            //menentukan class badge berdasarkan kategori
             $badge_class = 'badge-personal';
             if ($t['category_name'] == 'Work') {
               $badge_class = 'badge-work';
@@ -728,11 +760,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
       </div>
 
       <?php
+      // LIMIT 3 NOTES ONLY
       $note_query = "SELECT n.*, c.name as category_name 
                      FROM notes n
                      LEFT JOIN categories c ON n.category_id = c.id
                      WHERE n.user_id = ? 
-                     ORDER BY n.created_at DESC LIMIT 6";
+                     ORDER BY n.created_at DESC LIMIT 3";
       $stmt = $conn->prepare($note_query);
       $stmt->bind_param("i", $user_id);
       $stmt->execute();
@@ -744,21 +777,52 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
       <?php if ($total_notes > 0): ?>
         <div class="row g-3">
           <?php foreach ($notes as $i => $n): 
+            $note_redirect_page = '../notes/personal.php';
+            if ($n['category_id'] == 2) {
+              $note_redirect_page = '../notes/work.php';
+            } elseif ($n['category_id'] == 3) {
+              $note_redirect_page = '../notes/act.php';
+            }
+            
             $badge_class = 'badge-personal';
             if ($n['category_name'] == 'Work') {
               $badge_class = 'badge-work';
             } elseif ($n['category_name'] == 'Activities') {
               $badge_class = 'badge-activities';
             }
+
+            // Cek apakah ada foto
+            $foto_path = null;
+            if (!empty($n['foto'])) {
+              $foto_file = '../uploads/notes/' . $n['foto'];
+              if (file_exists(__DIR__ . '/../uploads/notes/' . $n['foto'])) {
+                $foto_path = $foto_file;
+              }
+            }
           ?>
             <div class="col-md-6 col-lg-4 item-card" style="animation-delay: <?= $i * 0.1 ?>s;">
-              <div class="card h-100 border-0 shadow-sm hover-lift border-start border-primary border-5">
+              <div class="card h-100 border-0 shadow-sm note-card-clickable border-start border-primary border-5" 
+                   data-note-redirect="<?= $note_redirect_page ?>"
+                   title="Klik untuk lihat kategori">
                 <div class="card-body p-3">
                   <?php if ($n['category_name']): ?>
                     <span class="category-badge <?= $badge_class ?>">
                       <?= htmlspecialchars($n['category_name']) ?>
                     </span>
                   <?php endif; ?>
+                  
+                  <!-- Tampilkan foto jika ada -->
+                  <?php if ($foto_path): ?>
+                    <img src="<?= htmlspecialchars($foto_path) ?>" 
+                         alt="<?= htmlspecialchars($n['title']) ?>" 
+                         class="note-image"
+                         loading="lazy">
+                  <?php else: ?>
+                    <div class="note-image-placeholder">
+                      <i class="fa-solid fa-image"></i>
+                    </div>
+                  <?php endif; ?>
+                  
                   <h6 class="fw-bold text-brown mb-2 text-truncate"><?= htmlspecialchars($n['title']) ?></h6>
                   <p class="note-content text-muted small mb-2">
                     <?= !empty($n['description']) ? htmlspecialchars($n['description']) : '<em>Tanpa isi</em>' ?>
@@ -771,11 +835,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
             </div>
           <?php endforeach; ?>
         </div>
-        <?php if ($total_notes >= 6): ?>
-          <div class="text-center mt-3">
-            <a href="../notes/personal.php" class="btn btn-sm btn-brown">Lihat Semua Notes</a>
-          </div>
-        <?php endif; ?>
+        <!-- Tombol Lihat Semua selalu muncul jika ada notes -->
+        <div class="text-center mt-3">
+          <a href="../notes/personal.php" class="btn btn-sm btn-brown">Lihat Semua Notes</a>
+        </div>
       <?php else: ?>
         <div class="text-center py-5">
           <div class="empty-icon mb-3"><i class="fa-solid fa-sticky-note fa-3x text-brown opacity-25"></i></div>
@@ -832,10 +895,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
       }
     }
 
-    //klik card untuk menampilkan detail todo, ke halaman detail todo yang di pilih
+    // Klik card todo untuk redirect
     document.querySelectorAll('.card-clickable').forEach(el => {
-      el.addEventListener('click', function(e) { //saat card di klik, jalankan fungsinya 
-        //jangan ke tampilan detail jika di klik button lain pada card 
+      el.addEventListener('click', function(e) {
         if (e.target.closest('button')) return;
         
         const redirect = this.dataset.redirect;
@@ -845,38 +907,46 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
       });
     });
 
-    //menyelesaikan todo 
-    document.querySelectorAll('.btn-complete').forEach(btn => { //tidak mengganggu tombol lainnya yang ada pada card 
+    // Klik card notes untuk redirect ke halaman kategori
+    document.querySelectorAll('.note-card-clickable').forEach(card => {
+      card.addEventListener('click', function(e) {
+        const redirectUrl = this.dataset.noteRedirect;
+        
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        }
+      });
+    });
+
+    // Menyelesaikan todo
+    document.querySelectorAll('.btn-complete').forEach(btn => {
       if (btn.disabled || btn.classList.contains('completed')) return;
 
       btn.addEventListener('click', function(e) {
-        e.stopPropagation(); // Prevent card click
+        e.stopPropagation();
         if (this.disabled) return;
-        //mengambil data penting
-        const todoId = this.dataset.id; ///ambil id yang mau di selesaikan 
+        
+        const todoId = this.dataset.id;
         const card = this.closest('.card');
         const todoItem = this.closest('.todo-item');
 
         fetch('', {
-            method: 'POST', //kirim data 
+            method: 'POST',
             headers: {
-              'Content-Type': 'application/x-www-form-urlencoded' //kirim data ke PHP dengan format POST form biasa
+              'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: 'action=complete_todo&todo_id=' + todoId //lakukan update todo 
+            body: 'action=complete_todo&todo_id=' + todoId
           })
           .then(res => res.json())
           .then(data => {
             if (data.success) {
-              //melakukan update tampilan jika sudah di selesaikan
-              this.innerHTML = '<i class="fa-solid fa-check-circle"></i>'; //menjadi centang saat sudah di selesaikan
+              this.innerHTML = '<i class="fa-solid fa-check-circle"></i>';
               this.classList.add('completed');
               this.disabled = true;
 
-              //mengubah warna saat card todo belum dan sesudahh selesai
-              card.classList.remove('border-warning'); //warna kuning sebelum todo selesai  
-              card.classList.add('border-success', 'completed'); //hijau saat sukses di selesaikan 
+              card.classList.remove('border-warning');
+              card.classList.add('border-success', 'completed');
 
-              //menampilkan button delete 
               const deleteBtn = card.querySelector('.btn-delete');
               if (deleteBtn) {
                 setTimeout(() => {
@@ -884,7 +954,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
                   deleteBtn.style.transform = 'scale(1)';
                 }, 100);
               }
-              //simpan waktu menyelesaikan todo 
+
               const now = new Date();
               const time = now.getHours().toString().padStart(2, '0') + ':' + 
                            now.getMinutes().toString().padStart(2, '0');
@@ -899,7 +969,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
                 timeContainer.appendChild(timeEl);
               }
 
-              // Update progress
               const completedCount = document.getElementById('completed-count');
               completedCount.textContent = parseInt(completedCount.textContent) + 1;
               updateProgressBar();
@@ -912,10 +981,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
       });
     });
 
-    //melakukan penghapusan todo 
+    // Menghapus todo
     document.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', function(e) {
-        e.stopPropagation(); //tetap melakukan aksi hapus, tidak ke aksi lainnya yang ada dalam card todo
+        e.stopPropagation();
         
         const todoId = this.dataset.id;
         const todoItem = this.closest('.todo-item');
@@ -932,26 +1001,22 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_todo') {
             .then(res => res.json())
             .then(data => {
               if (data.success) {
-                // Animation before remove
                 todoItem.classList.add('removing');
                 
                 setTimeout(() => {
                   todoItem.remove();
                   
-                  //melakukan update jumlah task, jika task sudah di hapus. 
                   const totalCount = document.getElementById('total-count');
                   const completedCount = document.getElementById('completed-count');
                   const newTotal = parseInt(totalCount.textContent) - 1;
                   totalCount.textContent = newTotal;
                   
-                  //logika update progress ketika todo sudah di selesaikan, dan di hapus
                   if (card.classList.contains('completed')) {
                     completedCount.textContent = parseInt(completedCount.textContent) - 1;
                   }
                   
                   updateProgressBar();
 
-                  //cek saat reload apakah masih ada task
                   const todoContainer = document.getElementById('todo-container');
                   if (todoContainer && todoContainer.children.length === 0) {
                     location.reload();
