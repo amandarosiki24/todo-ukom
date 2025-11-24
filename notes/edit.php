@@ -12,12 +12,12 @@ $role_name = $_SESSION['role_name'];
 $user_id   = $_SESSION['user_id'];
 $base_url  = '/todo-27rplb-b11-ukom';
 
-// CSRF Token
+//untuk keamanan dengan sesion
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Ambil ID note
+//ambil data id note
 if (!isset($_GET['id'])) {
   header("Location: personal.php");
   exit;
@@ -25,10 +25,10 @@ if (!isset($_GET['id'])) {
 $note_id = (int)$_GET['id'];
 
 // Fetch note (bisa dari semua type: personal/work/act)
-$stmt = $conn->prepare("SELECT * FROM notes WHERE id = ? AND user_id = ?");
-$stmt->bind_param("ii", $note_id, $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt = $conn->prepare("SELECT * FROM notes WHERE id = ? AND user_id = ?"); //pilih id note yg ingin di lihat atau edit 
+$stmt->bind_param("ii", $note_id, $user_id); //ambil catatan yang dipilih hanya tampilkan catatan akun yang sedang login
+$stmt->execute(); //jalankan query ke database
+$result = $stmt->get_result(); //simpan dalam variabel result
 
 if ($result->num_rows === 0) {
   header("Location: personal.php");

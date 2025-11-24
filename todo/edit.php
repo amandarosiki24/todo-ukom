@@ -38,10 +38,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_todo'])) {
   $title = trim($_POST['title']);
   $description = trim($_POST['description']);
   $category_id = intval($_POST['category_id']);
+  $photo_name = $todo['photo']; // Keep existing photo by default
+
+  // Handle photo upload
+  if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+    $upload_dir = '../uploads/todos/';
+    
+    // Create folder if not exists
+    if (!is_dir($upload_dir)) {
+      mkdir($upload_dir, 0777, true);
+    }
+
+    $file_tmp = $_FILES['photo']['tmp_name'];
+    $file_ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+    $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
+
+    if (in_array($file_ext, $allowed_ext)) {
+      // Delete old photo if exists
+      if (!empty($todo['photo']) && file_exists($upload_dir . $todo['photo'])) {
+        unlink($upload_dir . $todo['photo']);
+      }
+
+      // Generate unique filename
+      $photo_name = 'todo_' . time() . '_' . uniqid() . '.' . $file_ext;
+      $photo_path = $upload_dir . $photo_name;
+
+      // Upload file
+      if (!move_uploaded_file($file_tmp, $photo_path)) {
+        $photo_name = $todo['photo']; // Keep old photo if upload fails
+      }
+    }
+  }
+
+  // Handle photo removal
+  if (isset($_POST['remove_photo']) && $_POST['remove_photo'] === '1') {
+    if (!empty($todo['photo'])) {
+      $upload_dir = '../uploads/todos/';
+      if (file_exists($upload_dir . $todo['photo'])) {
+        unlink($upload_dir . $todo['photo']);
+      }
+    }
+    $photo_name = null;
+  }
 
   if (!empty($title)) {
-    $stmt = $conn->prepare("UPDATE todos SET title = ?, description = ?, category_id = ? WHERE id = ? AND user_id = ?");
-    $stmt->bind_param("ssiii", $title, $description, $category_id, $todo_id, $user_id);
+    $stmt = $conn->prepare("UPDATE todos SET title = ?, description = ?, category_id = ?, photo = ? WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("sssiii", $title, $description, $category_id, $photo_name, $todo_id, $user_id);
     
     if ($stmt->execute()) {
       // Redirect based on category
@@ -305,110 +347,175 @@ if ($categories_result) {
       background-color: #e7c9b3;
     }
 
-    /* Form Styles */
-    .form-card {
-      background: white;
-      border-radius: 15px;
-      padding: 40px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-      max-width: 700px;
+    /* Card Tambah Style (sama dengan tambah.php) */
+    .card-tambah {
+      max-width: 560px;
       margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(122,78,47,0.15);
+      overflow: hidden;
     }
 
-    .form-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .form-header i {
-      font-size: 32px;
-      color: #8B5E3C;
-    }
-
-    .form-header h2 {
-      font-size: 28px;
+    .card-header-tambah {
+      background-color: #7a4e2f;
+      padding: 20px;
+      text-align: center;
       font-weight: 700;
-      color: #8B5E3C;
-      margin: 0;
+      font-size: 1.4rem;
+      color: #fff;
     }
 
     .form-label {
       font-weight: 600;
-      color: #8B5E3C;
+      color: #333;
       margin-bottom: 8px;
     }
 
     .form-control, .form-select {
-      border: 2px solid #e0d5d0;
-      border-radius: 8px;
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
       padding: 12px 15px;
-      font-size: 15px;
       transition: 0.3s;
     }
 
     .form-control:focus, .form-select:focus {
-      border-color: #A46C4E;
-      box-shadow: 0 0 0 0.2rem rgba(139, 94, 60, 0.25);
+      border-color: #7a4e2f;
+      box-shadow: 0 0 0 0.2rem rgba(122,78,47,0.25);
     }
 
-    .btn-group-form {
-      display: flex;
-      gap: 12px;
-      margin-top: 30px;
+    textarea.form-control {
+      resize: vertical;
     }
 
-    .btn-submit {
-      flex: 1;
-      background-color: #8B5E3C;
-      color: white;
+    .btn-kembali {
+      background-color: #ddd;
+      color: #6c757d;
       border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
+      border-radius: 12px;
+      padding: 10px 30px;
       font-weight: 600;
-      font-size: 16px;
-      transition: 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-submit:hover {
-      background-color: #A46C4E;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(139, 94, 60, 0.3);
-    }
-
-    .btn-cancel {
-      flex: 1;
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 16px;
-      transition: 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.3s;
     }
 
-    .btn-cancel:hover {
-      background-color: #5a6268;
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    .btn-kembali:hover {
+      background-color: #ccc;
+      color: #5a6268;
+    }
+
+    .btn-simpan {
+      background-color: #7a4e2f;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 40px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn-simpan:hover {
+      background-color: #5c3a21;
     }
 
     .required {
       color: #E24A4A;
+    }
+
+    /* Upload Photo Styles */
+    .upload-photo-wrapper {
+      border: 2px dashed #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: 0.3s;
+      cursor: pointer;
+      background-color: #fafafa;
+    }
+
+    .upload-photo-wrapper:hover {
+      border-color: #7a4e2f;
+      background-color: #fff7f5;
+    }
+
+    .upload-photo-wrapper.drag-over {
+      border-color: #7a4e2f;
+      background-color: #fff7f5;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: #7a4e2f;
+      margin-bottom: 10px;
+    }
+
+    .upload-text {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .upload-info {
+      color: #999;
+      font-size: 12px;
+    }
+
+    #photoInput {
+      display: none;
+    }
+
+    .preview-container {
+      display: none;
+      margin-top: 15px;
+      position: relative;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .remove-photo-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(226, 74, 74, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 18px;
+    }
+
+    .remove-photo-btn:hover {
+      background-color: rgba(226, 74, 74, 1);
+      transform: scale(1.1);
+    }
+
+    .photo-filename {
+      margin-top: 10px;
+      color: #666;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .existing-photo-note {
+      margin-top: 8px;
+      color: #666;
+      font-size: 13px;
+      font-style: italic;
     }
   </style>
 </head>
@@ -482,52 +589,85 @@ if ($categories_result) {
 </div>
 
 <div class="content">
-  <div class="form-card">
-    <div class="form-header">
-      <i class="fa-solid fa-pen-to-square"></i>
-      <h2>Edit To Do</h2>
+  <div class="card card-tambah">
+    <div class="card-header card-header-tambah">EDIT TO DO</div>
+    <div class="card-body p-4">
+      <form method="POST" enctype="multipart/form-data">
+
+        <div class="mb-3">
+          <label class="form-label">Judul <span class="required">*</span></label>
+          <input type="text" class="form-control" name="title" value="<?= htmlspecialchars($todo['title']) ?>" placeholder="Masukkan judul..." required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Kategori <span class="required">*</span></label>
+          <select class="form-select" name="category_id" required>
+            <?php foreach ($categories as $cat): ?>
+              <option value="<?= $cat['id'] ?>" <?= $todo['category_id'] == $cat['id'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($cat['name']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Foto</label>
+          
+          <?php if (!empty($todo['photo'])): ?>
+            <div class="existing-photo-note">
+              <i class="fa-solid fa-image"></i> Foto saat ini: <?= htmlspecialchars($todo['photo']) ?>
+            </div>
+          <?php endif; ?>
+
+          <div class="upload-photo-wrapper" id="uploadPhotoWrapper" style="<?= !empty($todo['photo']) ? '' : '' ?>">
+            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+            <div class="upload-text">Klik atau drag foto ke sini</div>
+            <div class="upload-info">Format: JPG, JPEG, PNG, GIF (Max: 5MB)</div>
+            <?php if (!empty($todo['photo'])): ?>
+              <div class="upload-info mt-2" style="color: #7a4e2f;">
+                <i class="fa-solid fa-info-circle"></i> Upload foto baru untuk mengganti
+              </div>
+            <?php endif; ?>
+          </div>
+          
+          <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/jpg,image/png,image/gif">
+          <input type="hidden" name="remove_photo" id="removePhotoFlag" value="0">
+          
+          <div class="preview-container" id="previewContainer" style="<?= !empty($todo['photo']) ? 'display: block;' : '' ?>">
+            <img src="<?= !empty($todo['photo']) ? 'uploads/todos/' . htmlspecialchars($todo['photo']) : '' ?>" 
+                 alt="Preview" class="preview-image" id="previewImage">
+            <button type="button" class="remove-photo-btn" id="removePhotoBtn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="photo-filename" id="photoFilename"><?= !empty($todo['photo']) ? htmlspecialchars($todo['photo']) : '' ?></div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Deskripsi</label>
+          <textarea class="form-control" name="description" rows="6" placeholder="Masukkan deskripsi..."><?= htmlspecialchars($todo['description']) ?></textarea>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <?php
+          // Determine back URL based on category
+          $back_url = 'todo/personal.php';
+          if ($todo['category_id'] == 2) {
+            $back_url = 'todo/work.php';
+          } elseif ($todo['category_id'] == 3) {
+            $back_url = 'todo/act.php';
+          }
+          ?>
+          <a href="<?= $back_url ?>" class="btn-kembali">
+            <i class="fa-solid fa-arrow-left"></i> Batal
+          </a>
+          <button type="submit" name="update_todo" class="btn-simpan">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+          </button>
+        </div>
+
+      </form>
     </div>
-
-    <form method="POST">
-      <div class="mb-4">
-        <label class="form-label">Judul <span class="required">*</span></label>
-        <input type="text" class="form-control" name="title" value="<?= htmlspecialchars($todo['title']) ?>" placeholder="Masukkan judul to-do..." required>
-      </div>
-
-      <div class="mb-4">
-        <label class="form-label">Kategori <span class="required">*</span></label>
-        <select class="form-select" name="category_id" required>
-          <?php foreach ($categories as $cat): ?>
-            <option value="<?= $cat['id'] ?>" <?= $todo['category_id'] == $cat['id'] ? 'selected' : '' ?>>
-              <?= htmlspecialchars($cat['name']) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-
-      <div class="mb-4">
-        <label class="form-label">Deskripsi</label>
-        <textarea class="form-control" name="description" rows="6" placeholder="Masukkan deskripsi to-do..."><?= htmlspecialchars($todo['description']) ?></textarea>
-      </div>
-
-      <div class="btn-group-form">
-        <?php
-        // Determine back URL based on category
-        $back_url = 'todo/personal.php';
-        if ($todo['category_id'] == 2) {
-          $back_url = 'todo/work.php';
-        } elseif ($todo['category_id'] == 3) {
-          $back_url = 'todo/act.php';
-        }
-        ?>
-        <a href="<?= $back_url ?>" class="btn-cancel">
-          <i class="fa-solid fa-arrow-left"></i> Batal
-        </a>
-        <button type="submit" name="update_todo" class="btn-submit">
-          <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
-        </button>
-      </div>
-    </form>
   </div>
 </div>
 
@@ -550,6 +690,89 @@ if ($categories_result) {
         }
       });
     });
+
+    // Photo Upload Features
+    const uploadWrapper = document.getElementById('uploadPhotoWrapper');
+    const photoInput = document.getElementById('photoInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const photoFilename = document.getElementById('photoFilename');
+    const removePhotoFlag = document.getElementById('removePhotoFlag');
+
+    // Click to upload
+    uploadWrapper.addEventListener('click', function() {
+      photoInput.click();
+    });
+
+    // Handle file input change
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        handleFileUpload(file);
+      }
+    });
+
+    // Drag and drop
+    uploadWrapper.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      uploadWrapper.classList.add('drag-over');
+    });
+
+    uploadWrapper.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      uploadWrapper.classList.remove('drag-over');
+    });
+
+    uploadWrapper.addEventListener('drop', function(e) {
+      e.preventDefault();
+      uploadWrapper.classList.remove('drag-over');
+      
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        photoInput.files = e.dataTransfer.files;
+        handleFileUpload(file);
+      } else {
+        alert('Harap upload file gambar (JPG, PNG, GIF)');
+      }
+    });
+
+    // Remove photo
+    removePhotoBtn.addEventListener('click', function() {
+      if (confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
+        photoInput.value = '';
+        removePhotoFlag.value = '1';
+        previewContainer.style.display = 'none';
+        uploadWrapper.style.display = 'block';
+        photoFilename.textContent = '';
+      }
+    });
+
+    // Handle file upload
+    function handleFileUpload(file) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+      if (!allowedTypes.includes(file.type)) {
+        alert('Format file tidak didukung. Gunakan JPG, PNG, atau GIF');
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert('Ukuran file terlalu besar. Maksimal 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        photoFilename.textContent = file.name;
+        removePhotoFlag.value = '0';
+        uploadWrapper.style.display = 'none';
+        previewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
   });
 </script>
 

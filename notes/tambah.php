@@ -57,27 +57,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // Insert to database - PERBAIKAN DI SINI
+    // Insert to database
     if (!$error) {
-        // Cek apakah koneksi database ada
         if (!$conn) {
             $error = "Koneksi database gagal!";
         } else {
-            // Prepare statement dengan error handling (TANPA kolom 'type')
             $stmt = $conn->prepare("INSERT INTO notes (user_id, title, description, category_id, foto, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
             
-            // Cek apakah prepare berhasil
             if ($stmt === false) {
                 $error = "Error preparing statement: " . $conn->error;
-                // Hapus foto jika ada
                 if ($foto_name && file_exists($uploadDir . $foto_name)) {
                     unlink($uploadDir . $foto_name);
                 }
             } else {
-                // Bind parameter (5 parameter: user_id, title, description, category_id, foto)
                 $stmt->bind_param("issis", $user_id, $judul, $note, $category_id, $foto_name);
                 
-                // Execute
                 if ($stmt->execute()) {
                     $_SESSION['success_message'] = "Notes berhasil ditambahkan!";
                     $redirect_map = [
@@ -91,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header("Location: $redirect");
                     exit;
                 } else {
-                    // Hapus foto jika gagal insert
                     if ($foto_name && file_exists($uploadDir . $foto_name)) {
                         unlink($uploadDir . $foto_name);
                     }
@@ -118,7 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* [CSS sama seperti sebelumnya - tidak ada perubahan] */
         body { 
             font-family: 'Quicksand', sans-serif; 
             background-color: #fff7f5; 
@@ -619,9 +611,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 
                 <div class="d-flex justify-content-between">
-                    <a href="personal.php" id="btnKembali" class="btn btn-kembali">
+                    <button type="button" onclick="window.history.back()" class="btn btn-kembali">
                         <i class="fa-solid fa-arrow-left"></i>Kembali
-                    </a>
+                    </button>
                     <button type="submit" class="btn btn-simpan">
                         <i class="fa-solid fa-save me-2"></i>Simpan
                     </button>
@@ -650,21 +642,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     const kategoriSelect = document.getElementById('kategoriSelect');
-    const btnKembali = document.getElementById('btnKembali');
     
-    kategoriSelect.addEventListener('change', function() {
-        const kat = this.value;
-        const redirectMap = {
-            'personal': 'personal.php',
-            'work': 'work.php',
-            'activities': 'act.php'
-        };
-        btnKembali.href = redirectMap[kat] || 'personal.php';
-    });
-    
-    if (kategoriSelect.value) {
-        kategoriSelect.dispatchEvent(new Event('change'));
-    }
+    // Tidak perlu lagi update href tombol kembali karena menggunakan history.back()
     
     const uploadArea = document.getElementById('uploadArea');
     const fotoInput = document.getElementById('fotoInput');

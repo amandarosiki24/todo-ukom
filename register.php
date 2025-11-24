@@ -22,9 +22,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $role_id  = 2;
   $ava = null;
 
-  if ($username === '') $errors[] = "Username wajib diisi.";
-  if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Email tidak valid.";
+  //menampilkan pesan saat tidak di isi
+  if ($username === '') {
+    $errors[] = "Username wajib diisi.";
+  }
+  
+  if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = "Email tidak valid.";
+  }
+  
+  //membuat pesan validasi password, munculkan pesan saat password tidak di isi 
+  if ($password === '') {
+    $errors[] = "Password wajib diisi.";
+  } elseif (strlen($password) < 3) {
+    $errors[] = "Password minimal 3 karakter.";
+  }
 
+  //membuat pesan validasi saat username atau email sudah di gunakan
   if (empty($errors)) {
     $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
     $stmt->bind_param("ss", $username, $email);
@@ -36,35 +50,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
   }
 
-  // Upload foto profil
-  if (empty($errors) && !empty($_FILES['ava']['name'])) {
-    $fileTmp  = $_FILES['ava']['tmp_name'];
-    $fileName = basename($_FILES['ava']['name']);
+  
+  if (empty($errors) && !empty($_FILES['ava']['name'])) { //menyimpan foto sementara yang baru di upload pada lokasi file tmp
+    $fileTmp  = $_FILES['ava']['tmp_name']; //simpan file pada folder tmp oleh php 
+    $fileName = basename($_FILES['ava']['name']); 
     $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+    $allowed = ['jpg', 'jpeg', 'png', 'gif']; //format upload photo profile 
 
-    if (in_array($ext, $allowed)) {
-      $newName = 'ava_' . time() . '.' . $ext;
-      $targetPath = $uploadDir . $newName;
+    if (in_array($ext, $allowed)) { //melakukan pengecekan file ekstensi yang di izinkan/diperbolehkan sesuai dengan format yang ada
+      $newName = 'ava_' . time() . '.' . $ext; //awali dengan ava, dan di lanjut oleh waktu sekarang ini berdasarkan detik
+      $targetPath = $uploadDir . $newName; //lokasi folder tujuan 
 
-      if (move_uploaded_file($fileTmp, $targetPath)) {
-        $ava = $newName;
-      } else {
+      if (move_uploaded_file($fileTmp, $targetPath)) { //memindahkan file dari folder sementara tmp, ke folder tujuan
+        $ava = $newName; //jika berhasil simpan pada database
+      } else { //apabila gagal mengunggah, tampilkan pesan
         $errors[] = "Gagal mengunggah foto profil.";
       }
-    } else {
+    } else { //pesan gagal upload saat upload ava, tidak sesuai format 
       $errors[] = "Format file tidak didukung (gunakan JPG, PNG, atau GIF).";
     }
   }
 
+  //jika berhasil, simpan data ke dalam database
   if (empty($errors)) {
+    //siapkan query sql untuk menyimpan data user pada tabel "users",
     $stmt = $conn->prepare("INSERT INTO users (username, email, password, role_id, ava) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssis", $username, $email, $password, $role_id, $ava);
     if ($stmt->execute()) {
       $success = "Registrasi berhasil! Silakan <a href='index.php'>login</a>.";
-      $_POST = [];
+      //kosongkan tampilan formulir saat berhasil registrasi
+      $username = '';
+      $email = '';
+      $password = '';
     } else {
-      $errors[] = "Gagal menyimpan data. Silakan coba lagi.";
+      $errors[] = "Gagal menyimpan data. Silakan coba lagi."; 
     }
     $stmt->close();
   }
@@ -191,12 +210,12 @@ button:hover{background:#C97C5D;transform:translateY(-2px);}
   <h2><i class="fas fa-user-plus"></i> Daftar Akun Baru</h2>
 
   <?php if ($success): ?>
-    <div class="alert success"><?= $success ?></div>
+    <div class="alert success"><?= $success ?></div> <!-- tampilkan pesan saat berhasil, berwarna hijau saat berhasil melakukan registrasi-->
   <?php endif; ?>
 
   <?php if (!empty($errors)): ?>
     <div class="alert error">
-      <ul style="padding-left:18px;margin:6px 0">
+      <ul style="padding-left:18px;margin:6px 0"> <!--tampilkan pesan saat gagal berwarna merah-->
         <?php foreach ($errors as $e): ?>
           <li><?= htmlspecialchars($e) ?></li>
         <?php endforeach; ?>
@@ -210,22 +229,22 @@ button:hover{background:#C97C5D;transform:translateY(-2px);}
         <img id="preview" src="" alt="" style="display:none;">
         <div class="overlay"><i class="fas fa-camera"></i></div>
       </label>
-      <input type="file" name="ava" id="ava" accept="image/*" onchange="previewImage(event)">
+      <input type="file" name="ava" id="ava" accept="image/*" onchange="previewImage(event)"> <!--menampilkan preview saat sudah berhasil mengupload foto-->
     </div>
 
     <div class="form-group">
       <label for="username">Username</label>
-      <input id="username" name="username" type="text" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" required>
+      <input id="username" name="username" type="text" value="" required autocomplete="off">
     </div>
 
     <div class="form-group">
       <label for="email">Email</label>
-      <input id="email" name="email" type="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
+      <input id="email" name="email" type="email" value="" required autocomplete="off"> <!--matikan format rekomendasi-->
     </div>
 
     <div class="form-group">
       <label for="password">Password</label>
-      <input id="password" name="password" type="password" value="<?= htmlspecialchars($_POST['password'] ?? '') ?>">
+      <input id="password" name="password" type="password" value="" required autocomplete="new-password">
     </div>
 
     <button type="submit"><i class="fas fa-check-circle"></i> Daftar Sekarang</button>
@@ -236,7 +255,7 @@ button:hover{background:#C97C5D;transform:translateY(-2px);}
 
 <script>
 function previewImage(event) {
-  const reader = new FileReader();
+  const reader = new FileReader(); //untuk membaca file
   reader.onload = function(){
     const output = document.getElementById('preview');
     output.src = reader.result;

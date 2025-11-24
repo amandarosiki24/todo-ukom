@@ -15,6 +15,18 @@ if (isset($_GET['delete'])) {
     $delete_id = intval($_GET['delete']);
     $user_id = $_SESSION['user_id'];
 
+    // Get photo filename before deleting
+    $photo_result = $conn->query("SELECT photo FROM todos WHERE id = $delete_id AND user_id = $user_id");
+    if ($photo_result && $photo_result->num_rows > 0) {
+        $photo_row = $photo_result->fetch_assoc();
+        if (!empty($photo_row['photo'])) {
+            $photo_path = '../uploads/todos/' . $photo_row['photo'];
+            if (file_exists($photo_path)) {
+                unlink($photo_path);
+            }
+        }
+    }
+
     $conn->query("DELETE FROM todos WHERE id = $delete_id AND user_id = $user_id");
 
     header("Location: personal.php");
@@ -298,7 +310,7 @@ if (isset($_GET['delete'])) {
       background-color: #e7c9b3;
     }
 
-    /* Todo Styles - Updated to match Notes */
+    /* Todo Styles - Updated with Photo */
     .todo-header {
       display: flex;
       justify-content: space-between;
@@ -347,11 +359,13 @@ if (isset($_GET['delete'])) {
     .todo-card {
       background: white;
       border-radius: 12px;
-      padding: 20px;
+      overflow: hidden;
       border-left: 4px solid;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       transition: transform 0.3s, box-shadow 0.3s;
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
 
     .todo-card:nth-child(4n+1) {
@@ -375,11 +389,26 @@ if (isset($_GET['delete'])) {
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     }
 
+    .todo-card-photo {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background-color: #f5f5f5;
+    }
+
+    .todo-card-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
     .todo-card-title {
       font-size: 18px;
       font-weight: 700;
       color: #333;
       margin-bottom: 8px;
+      padding-right: 70px;
     }
 
     .todo-content {
@@ -392,6 +421,7 @@ if (isset($_GET['delete'])) {
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
+      flex: 1;
     }
 
     .todo-date {
@@ -400,6 +430,7 @@ if (isset($_GET['delete'])) {
       gap: 6px;
       font-size: 13px;
       color: #999;
+      margin-top: auto;
     }
 
     .todo-actions {
@@ -408,6 +439,7 @@ if (isset($_GET['delete'])) {
       right: 15px;
       display: flex;
       gap: 8px;
+      z-index: 10;
     }
 
     .btn-todo-action {
@@ -421,10 +453,11 @@ if (isset($_GET['delete'])) {
       font-size: 14px;
       cursor: pointer;
       transition: 0.3s;
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
 
     .btn-edit {
-      background-color: #f0f0f0;
       color: #666;
     }
 
@@ -434,7 +467,6 @@ if (isset($_GET['delete'])) {
     }
 
     .btn-delete {
-      background-color: #f0f0f0;
       color: #666;
     }
 
@@ -453,6 +485,32 @@ if (isset($_GET['delete'])) {
       font-size: 64px;
       margin-bottom: 20px;
       color: #ddd;
+    }
+
+    .no-photo-placeholder {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+      font-size: 48px;
+    }
+
+    .photo-badge {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background-color: rgba(139, 94, 60, 0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
   </style>
 </head>
@@ -562,13 +620,31 @@ if (isset($_GET['delete'])) {
               </button>
             </div>
             
-            <div class="todo-card-title"><?= htmlspecialchars($row['title']); ?></div>
-            <div class="todo-content">
-              <?= empty($row['description']) ? 'Tanpa deskripsi' : nl2br(htmlspecialchars($row['description'])); ?>
-            </div>
-            <div class="todo-date">
-              <i class="fa-regular fa-calendar"></i>
-              <?= date('d M H:i', strtotime($row['created_at'])) ?>
+            <?php if (!empty($row['photo'])): ?>
+              <div style="position: relative;">
+                <img src="uploads/todos/<?= htmlspecialchars($row['photo']); ?>" 
+                     alt="<?= htmlspecialchars($row['title']); ?>" 
+                     class="todo-card-photo"
+                     onerror="this.parentElement.innerHTML='<div class=\'no-photo-placeholder\'><i class=\'fa-solid fa-image\'></i></div>'">
+                <div class="photo-badge">
+                  <i class="fa-solid fa-image"></i> Foto
+                </div>
+              </div>
+            <?php else: ?>
+              <div class="no-photo-placeholder">
+                <i class="fa-solid fa-image"></i>
+              </div>
+            <?php endif; ?>
+            
+            <div class="todo-card-body">
+              <div class="todo-card-title"><?= htmlspecialchars($row['title']); ?></div>
+              <div class="todo-content">
+                <?= empty($row['description']) ? 'Tanpa deskripsi' : nl2br(htmlspecialchars($row['description'])); ?>
+              </div>
+              <div class="todo-date">
+                <i class="fa-regular fa-calendar"></i>
+                <?= date('d M H:i', strtotime($row['created_at'])) ?>
+              </div>
             </div>
           </div>
         <?php endwhile; ?>

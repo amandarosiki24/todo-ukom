@@ -5,7 +5,7 @@ include '../db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $judul      = $_POST['judul'];
-    $tanggal    = date('Y-m-d'); 
+    $tanggal    = $_POST['tanggal'] ?? date('Y-m-d'); 
     $kategori   = $_POST['kategori'];
     $deskripsi  = $_POST['deskripsi'];
     $userid     = $_SESSION['user_id'];
@@ -18,11 +18,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $category_id = $mapKategori[$kategori] ?? null;
 
+    // Handle upload foto
+    $photo_name = null;
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = '../uploads/todos/';
+        
+        // Buat folder jika belum ada
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+
+        $file_tmp = $_FILES['photo']['tmp_name'];
+        $file_ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (in_array($file_ext, $allowed_ext)) {
+            // Generate nama file unik
+            $photo_name = 'todo_' . time() . '_' . uniqid() . '.' . $file_ext;
+            $photo_path = $upload_dir . $photo_name;
+
+            // Upload file
+            if (!move_uploaded_file($file_tmp, $photo_path)) {
+                $photo_name = null; // Reset jika gagal upload
+            }
+        }
+    }
+
     $stmt = $conn->prepare("
-        INSERT INTO todos (user_id, title, description, category_id, created_at)
-        VALUES (?, ?, ?, ?, NOW())
+        INSERT INTO todos (user_id, title, description, category_id, photo, created_at)
+        VALUES (?, ?, ?, ?, ?, NOW())
     ");
-    $stmt->bind_param("issi", $userid, $judul, $deskripsi, $category_id);
+    $stmt->bind_param("issis", $userid, $judul, $deskripsi, $category_id, $photo_name);
 
     if ($stmt->execute()) {
 
@@ -400,6 +426,92 @@ $tanggal_hari_ini = date('Y-m-d');
       font-size: 14px;
       margin-top: 6px;
     }
+
+    /* Style untuk upload foto */
+    .upload-photo-wrapper {
+      border: 2px dashed #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: 0.3s;
+      cursor: pointer;
+      background-color: #fafafa;
+    }
+
+    .upload-photo-wrapper:hover {
+      border-color: #7a4e2f;
+      background-color: #fff7f5;
+    }
+
+    .upload-photo-wrapper.drag-over {
+      border-color: #7a4e2f;
+      background-color: #fff7f5;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: #7a4e2f;
+      margin-bottom: 10px;
+    }
+
+    .upload-text {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .upload-info {
+      color: #999;
+      font-size: 12px;
+    }
+
+    #photoInput {
+      display: none;
+    }
+
+    .preview-container {
+      display: none;
+      margin-top: 15px;
+      position: relative;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .remove-photo-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(226, 74, 74, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 18px;
+    }
+
+    .remove-photo-btn:hover {
+      background-color: rgba(226, 74, 74, 1);
+      transform: scale(1.1);
+    }
+
+    .photo-filename {
+      margin-top: 10px;
+      color: #666;
+      font-size: 13px;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -475,7 +587,7 @@ $tanggal_hari_ini = date('Y-m-d');
   <div class="card card-tambah">
     <div class="card-header card-header-tambah">TAMBAH TO DO</div>
     <div class="card-body p-4">
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
 
         <div class="mb-3">
           <label class="form-label">Judul <span class="required">*</span></label>
@@ -483,12 +595,8 @@ $tanggal_hari_ini = date('Y-m-d');
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Tanggal</label>
-          <input type="date" name="tanggal" class="form-control" value="<?= $tanggal_hari_ini ?>" disabled>
-          <div class="date-info">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>Tanggal otomatis menggunakan hari ini</span>
-          </div>
+          <label class="form-label">Tanggal <span class="required">*</span></label>
+          <input type="date" name="tanggal" class="form-control" value="<?= $tanggal_hari_ini ?>" required>
         </div>
 
         <div class="mb-3">
@@ -510,6 +618,24 @@ $tanggal_hari_ini = date('Y-m-d');
           </div>
 
           <input type="hidden" name="kategori" id="kategoriInput" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Foto</label>
+          <div class="upload-photo-wrapper" id="uploadPhotoWrapper">
+            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+            <div class="upload-text">Klik atau drag foto ke sini</div>
+            <div class="upload-info">Format: JPG, JPEG, PNG, GIF (Max: 5MB)</div>
+          </div>
+          <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/jpg,image/png,image/gif">
+          
+          <div class="preview-container" id="previewContainer">
+            <img src="" alt="Preview" class="preview-image" id="previewImage">
+            <button type="button" class="remove-photo-btn" id="removePhotoBtn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="photo-filename" id="photoFilename"></div>
+          </div>
         </div>
 
         <div class="mb-4">
@@ -569,6 +695,83 @@ $tanggal_hari_ini = date('Y-m-d');
         else if (kat === 'activity') btnKembali.href = 'todo/act.php';
       });
     });
+
+    // Fitur Upload Foto
+    const uploadWrapper = document.getElementById('uploadPhotoWrapper');
+    const photoInput = document.getElementById('photoInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const photoFilename = document.getElementById('photoFilename');
+
+    // Klik untuk upload
+    uploadWrapper.addEventListener('click', function() {
+      photoInput.click();
+    });
+
+    // Handle file input change
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        handleFileUpload(file);
+      }
+    });
+
+    // Drag and drop
+    uploadWrapper.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      uploadWrapper.classList.add('drag-over');
+    });
+
+    uploadWrapper.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      uploadWrapper.classList.remove('drag-over');
+    });
+
+    uploadWrapper.addEventListener('drop', function(e) {
+      e.preventDefault();
+      uploadWrapper.classList.remove('drag-over');
+      
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        photoInput.files = e.dataTransfer.files;
+        handleFileUpload(file);
+      } else {
+        alert('Harap upload file gambar (JPG, PNG, GIF)');
+      }
+    });
+
+    // Remove photo
+    removePhotoBtn.addEventListener('click', function() {
+      photoInput.value = '';
+      previewContainer.style.display = 'none';
+      uploadWrapper.style.display = 'block';
+    });
+
+    // Handle file upload
+    function handleFileUpload(file) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+      if (!allowedTypes.includes(file.type)) {
+        alert('Format file tidak didukung. Gunakan JPG, PNG, atau GIF');
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert('Ukuran file terlalu besar. Maksimal 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        photoFilename.textContent = file.name;
+        uploadWrapper.style.display = 'none';
+        previewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
   });
 </script>
 

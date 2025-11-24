@@ -529,9 +529,10 @@ $role_name = $_SESSION['role_name'] ?? '';
                 <!-- ava -->
                 <div class="col-md-4 text-center">
                     <div class="avatar-container">
-                        <?php if ($hasAvatar): ?>
+                        <?php if ($hasAvatar): ?> <!--melakukan pengecekan, apakah pengguna memiliki profile jika pengguna memiliki profile tapilkan ava nya-->
                             <img src="<?= htmlspecialchars($avatarPath); ?>" alt="Avatar" class="avatar-img">
                         <?php else: ?>
+                            <!--jika pengguna tidak memiliki profile, tampilkan inisial pengguna-->
                             <div class="avatar-initial"><?= htmlspecialchars($initials); ?></div>
                         <?php endif; ?>
                     </div>
@@ -561,7 +562,7 @@ $role_name = $_SESSION['role_name'] ?? '';
             const menuLinks = document.querySelectorAll('.menu-link');
 
             menuLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
+                link.addEventListener('click', function(e) {
                     const target = this.dataset.target;
                     const submenu = document.getElementById(target + '-submenu');
 

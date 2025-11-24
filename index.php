@@ -1,51 +1,47 @@
 <?php
-session_start();
-
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "tdl_ukom";
-
-$conn = new mysqli($host, $user, $pass, $db);
-if ($conn->connect_error) {
-  die("Koneksi gagal: " . $conn->connect_error);
-}
-
-$error = "";
-
+session_start(); //menyiapkan session untuk simpan data login user
+require_once 'db.php'; //include file pada db.php 
+//melakukan pengecekan apakah submit menggunakan metode post
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $email    = $conn->real_escape_string($_POST['email']);
-  $password = $conn->real_escape_string($_POST['password']);
-
-  $sql = "SELECT u.*, r.name AS role_name 
-            FROM users u 
-            JOIN roles r ON u.role_id = r.id 
-            WHERE u.email = '$email' 
-            LIMIT 1";
-
-  $result = $conn->query($sql);
-
+  $email    = trim($_POST['email']); //ambil data 
+  $password = $_POST['password'];
+//query untuk mengambil data pada user
+//query untuk mengambil data pada user
+//role join pada tabel user untuk mengetahui role user yang sedang login
+  $sql = "SELECT u.*, r.name AS role_name
+          FROM users u 
+          JOIN roles r ON u.role_id = r.id  
+          WHERE u.email = ? 
+          LIMIT 1";
+  //megatur keamanan sql injection
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("s", $email);
+  $stmt->execute(); //jalankan query 
+  $result = $stmt->get_result(); //mengambil hasil query 
+   
   if ($result->num_rows > 0) {
+    //ambil data user sebagai array
     $user = $result->fetch_assoc();
-
-    if ($password === $user['password']) {
+    if ($password === $user['password']) { //melakukan pengecekan, apakah password yang di input sesuai dengan data pada database 
+      //simpan data user ke session
       $_SESSION['user_id']   = $user['id'];
       $_SESSION['email']     = $user['email'];
       $_SESSION['username']  = $user['username'];
       $_SESSION['role_id']   = $user['role_id'];
       $_SESSION['role_name'] = $user['role_name'];
 
-      header("Location: pages/dashboard.php");
+      header("Location: pages/dashboard.php"); //redirect ke halaman dashboard
       exit;
-    } else {
+    } else { //tampilan pesan password salah jika tidak sesuai dengan data pada database
       $error = "Password salah!";
     }
-  } else {
+  } else { //tampilan pesan saat email tidak ada pada database
     $error = "Email tidak ditemukan!";
   }
+  //tutup prepared statement
+  $stmt->close();
 }
-
-$conn->close();
+$conn->close(); //tutup koneksi db
 ?>
 
 <!DOCTYPE html>

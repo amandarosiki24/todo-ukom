@@ -753,7 +753,6 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
   <?php endif; ?>
 </div>
 
-<!-- Modal untuk preview gambar -->
 <div id="imageModal" class="image-modal" onclick="closeImageModal()">
   <span class="modal-close" onclick="closeImageModal()">&times;</span>
   <img class="image-modal-content" id="modalImage">
@@ -787,7 +786,6 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
     }
   }
 
-  // Preview gambar dalam modal
   function openImageModal(imageSrc, imageTitle) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
@@ -802,7 +800,6 @@ $notes = $result->fetch_all(MYSQLI_ASSOC);
     document.getElementById('imageModal').style.display = 'none';
   }
 
-  // Close modal dengan ESC key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       closeImageModal();
